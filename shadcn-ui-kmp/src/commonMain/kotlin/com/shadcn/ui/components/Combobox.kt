@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,11 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +44,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,21 +62,25 @@ import kotlin.math.roundToInt
  * @param selectedOption The currently selected option. Null if no option is selected.
  * @param onOptionSelected Callback invoked when an option is selected. Provides the selected string.
  * @param modifier The modifier to be applied to the combobox container.
+ * @param enabled Controls the enabled state of the combobox. When `false`, this combobox will not
+ *      be interactable and will appear visually muted.
  * @param placeholder The placeholder text to display when no option is selected.
+ * @param dropdownMaxHeight The maximum height of the dropdown list. Defaults to 200.dp.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComboBox(
     options: List<String>,
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Select option..."
+    enabled: Boolean = true,
+    placeholder: String = "Select option...",
+    dropdownMaxHeight: Dp = 200.dp
 ) {
     val styles = MaterialTheme.styles
     val radius = MaterialTheme.radius
     var expanded by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf(selectedOption ?: "") } // Initialize with selected option
+    var searchText by remember { mutableStateOf(selectedOption ?: "") }
 
     // State to hold the position and width of the input field
     var inputWidthPx by remember { mutableIntStateOf(0) }
@@ -85,9 +91,10 @@ fun ComboBox(
     val density = LocalDensity.current
 
     // Update searchText when selectedOption changes externally, but only if the dropdown is not expanded
-    // This prevents overwriting user's search input if they are actively typing
-    if (selectedOption != searchText && !expanded) {
-        searchText = selectedOption ?: ""
+    LaunchedEffect(selectedOption, expanded) {
+        if (selectedOption != searchText && !expanded) {
+            searchText = selectedOption ?: ""
+        }
     }
 
     val filteredOptions = remember(options, searchText) {
@@ -103,9 +110,17 @@ fun ComboBox(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val currentBorderColor by animateColorAsState(
-        targetValue = if (isFocused || isPressed || expanded) styles.ring else styles.border,
+        targetValue = when {
+            !enabled -> styles.border
+            isFocused || isPressed || expanded -> styles.ring
+            else -> styles.border
+        },
         animationSpec = tween(150), label = "comboboxBorderColor"
     )
+
+    val textColor = if (enabled) styles.foreground else styles.mutedForeground
+    val iconTint = styles.mutedForeground
+    val containerBackground = if (enabled) Color.Transparent else styles.muted
 
     Column(modifier = modifier) {
         // Input field that triggers the dropdown
@@ -114,7 +129,6 @@ fun ComboBox(
                 .fillMaxWidth()
                 .height(48.dp)
                 .onGloballyPositioned { coordinates ->
-                    // Get the size and position of the input field
                     inputWidthPx = coordinates.size.width
                     inputHeightPx = coordinates.size.height
                     val position = coordinates.parentLayoutCoordinates?.windowToLocal(coordinates.positionInWindow())
@@ -122,21 +136,27 @@ fun ComboBox(
                     inputYPositionPx = position?.y?.roundToInt() ?: 0
                 }
                 .clip(RoundedCornerShape(radius.md))
-                .border(1.dp, currentBorderColor, RoundedCornerShape(radius.md)) // border border-input or border-ring
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) {
-                    expanded = !expanded
-                    if (expanded) { // If opening the combobox
-                        searchText = "" // Always clear the search text when opening
-                    } else { // If closing the combobox
-                        // When closing, if nothing selected and text typed, clear text
-                        if (selectedOption == null && searchText.isNotBlank()) {
-                            searchText = ""
+                .background(containerBackground)
+                .border(1.dp, currentBorderColor, RoundedCornerShape(radius.md))
+                .then(
+                    if (enabled) {
+                        Modifier.clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {
+                            expanded = !expanded
+                            if (expanded) {
+                                searchText = ""
+                            } else {
+                                if (selectedOption == null && searchText.isNotBlank()) {
+                                    searchText = ""
+                                }
+                            }
                         }
+                    } else {
+                        Modifier
                     }
-                }
+                )
                 .padding(horizontal = 12.dp),
             contentAlignment = Alignment.CenterStart
         ) {
@@ -145,17 +165,16 @@ fun ComboBox(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Display selected option or placeholder
                 Text(
                     text = selectedOption ?: placeholder,
-                    color = if (selectedOption != null) styles.foreground else styles.mutedForeground,
-                    fontSize = 14.sp, // text-sm
+                    color = if (selectedOption != null) textColor else styles.mutedForeground,
+                    fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = "Dropdown arrow",
-                    tint = styles.mutedForeground,
+                    tint = iconTint,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -164,18 +183,15 @@ fun ComboBox(
         // Dropdown Popup
         if (expanded) {
             Popup(
-                // Position the popup relative to the input field
                 offset = IntOffset(inputXPositionPx, inputYPositionPx + inputHeightPx),
-                properties = PopupProperties(focusable = true), // Make popup focusable to handle outside clicks
+                properties = PopupProperties(focusable = true),
                 onDismissRequest = {
                     expanded = false
-                    // Reset search text if no option was selected on dismiss
                     if (selectedOption == null) {
                         searchText = ""
                     }
                 }
             ) {
-                // Dropdown content container
                 Box(
                     modifier = Modifier
                         .shadow(1.dp, RoundedCornerShape(radius.lg))
@@ -188,7 +204,6 @@ fun ComboBox(
                             .border(1.dp, styles.border, RoundedCornerShape(radius.lg))
                             .padding(8.dp)
                     ) {
-                        // Search TextField inside the dropdown
                         Input(
                             value = searchText,
                             onValueChange = { searchText = it },
@@ -198,7 +213,6 @@ fun ComboBox(
                             singleLine = true,
                         )
 
-                        // Display filtered options or "No results" message
                         if (filteredOptions.isEmpty()) {
                             Text(
                                 text = "No results found.",
@@ -212,7 +226,7 @@ fun ComboBox(
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp) // Fixed height for scrollable options
+                                    .heightIn(max = dropdownMaxHeight)
                             ) {
                                 items(filteredOptions) { option ->
                                     val isSelected = option == selectedOption
@@ -228,8 +242,8 @@ fun ComboBox(
                                             .background(optionBackgroundColor)
                                             .clickable {
                                                 onOptionSelected(option)
-                                                searchText = option // Update search text to selected option
-                                                expanded = false // Close popup on selection
+                                                searchText = option
+                                                expanded = false
                                             }
                                             .padding(horizontal = 8.dp, vertical = 8.dp),
                                         verticalAlignment = Alignment.CenterVertically,

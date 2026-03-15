@@ -4,6 +4,16 @@ import androidx.compose.material3.SnackbarDuration
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
+/**
+ * Represents a Sonner snackbar event to be dispatched through [SonnerProvider].
+ *
+ * @property message The primary message to display.
+ * @property subMessage Optional secondary message displayed below the primary message.
+ * @property action Optional action button configuration.
+ * @property withDismissAction Whether to show a dismiss button.
+ * @property variant The visual variant of the snackbar.
+ * @property duration The display duration of the snackbar.
+ */
 data class SonnerEvent(
     val message: String,
     val subMessage: String? = null,
@@ -13,16 +23,29 @@ data class SonnerEvent(
     val duration: SnackbarDuration = SnackbarDuration.Short
 )
 
+/**
+ * Defines an action button for a Sonner snackbar.
+ *
+ * @property actionText The label displayed on the action button.
+ * @property execute The callback invoked when the action button is clicked.
+ */
 data class SonnerAction(
     val actionText: String,
     val execute: () -> Unit
 )
 
+/**
+ * Singleton provider for dispatching Sonner snackbar events.
+ *
+ * Exposes a [events] flow that [SonnerHost] observes to display snackbars.
+ * Use [showMessage] for informational notifications and [showError] for error/destructive notifications.
+ */
 object SonnerProvider {
     private val _events = Channel<SonnerEvent>()
     val events = _events.receiveAsFlow()
 
-    suspend fun showMessage(
+    private suspend fun show(
+        variant: SonnerVariant,
         message: String,
         subMessage: String? = null,
         action: SonnerAction? = null,
@@ -35,10 +58,20 @@ object SonnerProvider {
                 subMessage,
                 action,
                 withDismissAction,
-                SonnerVariant.Default,
+                variant,
                 duration
             )
         )
+    }
+
+    suspend fun showMessage(
+        message: String,
+        subMessage: String? = null,
+        action: SonnerAction? = null,
+        withDismissAction: Boolean = false,
+        duration: SnackbarDuration = SnackbarDuration.Short
+    ) {
+        show(SonnerVariant.Default, message, subMessage, action, withDismissAction, duration)
     }
 
     suspend fun showError(
@@ -48,15 +81,6 @@ object SonnerProvider {
         withDismissAction: Boolean = false,
         duration: SnackbarDuration = SnackbarDuration.Short
     ) {
-        _events.send(
-            SonnerEvent(
-                message,
-                subMessage,
-                action,
-                withDismissAction,
-                SonnerVariant.Destructive,
-                duration
-            )
-        )
+        show(SonnerVariant.Destructive, message, subMessage, action, withDismissAction, duration)
     }
 }

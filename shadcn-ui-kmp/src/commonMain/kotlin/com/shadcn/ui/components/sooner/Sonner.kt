@@ -23,8 +23,24 @@ import com.shadcn.ui.components.Button
 import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.ButtonVariant
 import com.shadcn.ui.themes.radius
+import androidx.compose.ui.graphics.Color
+import com.shadcn.ui.themes.ShadcnStyles
 import com.shadcn.ui.themes.styles
 
+/**
+ * A styled snackbar component inspired by the Sonner toast library.
+ *
+ * Displays a notification bar with a title, optional subtitle, action button, and dismiss button.
+ * Supports default and destructive variants with appropriate theming.
+ *
+ * @param modifier The [Modifier] to apply to the snackbar.
+ * @param title The primary message displayed in the snackbar.
+ * @param subtitle An optional secondary message displayed below the title.
+ * @param actionLabel The text label for the optional action button.
+ * @param onActionClick Callback invoked when the action button is clicked.
+ * @param onDismiss Callback invoked when the dismiss button is clicked.
+ * @param variant The visual variant of the snackbar, either [SonnerVariant.Default] or [SonnerVariant.Destructive].
+ */
 @Composable
 fun Sonner(
     modifier: Modifier = Modifier,
@@ -37,30 +53,12 @@ fun Sonner(
 ) {
     val styles = MaterialTheme.styles
     val radius = MaterialTheme.radius
-    val containerColor = when (variant) {
-        SonnerVariant.Default -> styles.snackbar
-        SonnerVariant.Destructive -> styles.destructive
-    }
-
-    val contentColor = when (variant) {
-        SonnerVariant.Default -> styles.foreground
-        SonnerVariant.Destructive -> styles.destructiveForeground
-    }
-
-    val actionContentColor = when (variant) {
-        SonnerVariant.Default -> styles.mutedForeground
-        SonnerVariant.Destructive -> styles.destructiveForeground
-    }
-
-    val border = when (variant) {
-        SonnerVariant.Default -> styles.border
-        SonnerVariant.Destructive -> styles.destructive
-    }
+    val (containerColor, contentColor, actionContentColor, border) = resolveSonnerColors(variant, styles)
     Snackbar(
         modifier = modifier
             .padding(16.dp)
             .border(1.dp, border, RoundedCornerShape(radius.lg)),
-        action = if (actionLabel != null && onActionClick != null && onDismiss == null) {
+        action = if (actionLabel != null && onActionClick != null) {
             {
                 if (variant == SonnerVariant.Destructive) {
                     Box(
@@ -131,4 +129,29 @@ fun Sonner(
             }
         }
     }
+}
+
+private data class SonnerColors(
+    val containerColor: Color,
+    val contentColor: Color,
+    val actionContentColor: Color,
+    val border: Color
+)
+
+private fun resolveSonnerColors(
+    variant: SonnerVariant,
+    styles: ShadcnStyles
+): SonnerColors = when (variant) {
+    SonnerVariant.Default -> SonnerColors(
+        containerColor = styles.snackbar,
+        contentColor = styles.foreground,
+        actionContentColor = styles.mutedForeground,
+        border = styles.border
+    )
+    SonnerVariant.Destructive -> SonnerColors(
+        containerColor = styles.destructive,
+        contentColor = styles.destructiveForeground,
+        actionContentColor = styles.destructiveForeground,
+        border = styles.destructive
+    )
 }

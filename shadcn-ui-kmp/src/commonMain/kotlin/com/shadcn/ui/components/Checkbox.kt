@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -45,38 +46,40 @@ fun Checkbox(
     colors: CheckboxColors = CheckboxDefaults.colors()
 ) {
     val radius = MaterialTheme.radius
-    
-    // Animate background color
+
+    // Resolve all colors in a single block
+    val resolved = when {
+        !enabled -> ResolvedCheckboxColors(
+            background = colors.disabledColor,
+            border = colors.disabledColor,
+            checkmark = colors.disabledCheckmarkColor
+        )
+        checked -> ResolvedCheckboxColors(
+            background = colors.checkedColor,
+            border = colors.checkedBorderColor,
+            checkmark = colors.checkedCheckmarkColor
+        )
+        else -> ResolvedCheckboxColors(
+            background = colors.uncheckedColor,
+            border = colors.uncheckedBorderColor,
+            checkmark = colors.uncheckedCheckmarkColor
+        )
+    }
+
     val backgroundColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> colors.disabledColors
-            checked -> colors.checkedColors
-            else -> colors.uncheckedColors
-        },
+        targetValue = resolved.background,
         animationSpec = tween(durationMillis = 100), label = "checkboxBackgroundColor"
     )
-
-    // Animate border color
     val borderColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> colors.disabledColors
-            checked -> colors.checkedBorderColors
-            else -> colors.unCheckedBorderColors
-        },
+        targetValue = resolved.border,
         animationSpec = tween(durationMillis = 100), label = "checkboxBorderColor"
     )
-
-    // Animate checkmark color
     val checkmarkColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> colors.disabledCheckMarkColor
-            checked -> colors.checkedCheckmarkColor
-            else -> colors.uncheckedCheckmarkColor
-        },
+        targetValue = resolved.checkmark,
         animationSpec = tween(durationMillis = 100), label = "checkboxCheckmarkColor"
     )
 
-    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val currentBorderColor = if (isPressed && enabled) {
@@ -110,30 +113,56 @@ fun Checkbox(
     }
 }
 
-data class CheckboxColors(
-    val checkedColors: Color,
-    val uncheckedColors: Color,
-    val disabledColors: Color,
-    val disabledCheckMarkColor: Color,
-    val checkedCheckmarkColor: Color,
-    val uncheckedCheckmarkColor: Color,
-    val checkedBorderColors: Color,
-    val unCheckedBorderColors: Color,
+private data class ResolvedCheckboxColors(
+    val background: Color,
+    val border: Color,
+    val checkmark: Color
 )
 
+/**
+ * Holds the color values used by a [Checkbox] in different states.
+ *
+ * @param checkedColor Background color when checked.
+ * @param uncheckedColor Background color when unchecked.
+ * @param disabledColor Background color when disabled.
+ * @param disabledCheckmarkColor Checkmark color when disabled.
+ * @param checkedCheckmarkColor Checkmark color when checked.
+ * @param uncheckedCheckmarkColor Checkmark color when unchecked.
+ * @param checkedBorderColor Border color when checked.
+ * @param uncheckedBorderColor Border color when unchecked.
+ */
+data class CheckboxColors(
+    val checkedColor: Color,
+    val uncheckedColor: Color,
+    val disabledColor: Color,
+    val disabledCheckmarkColor: Color,
+    val checkedCheckmarkColor: Color,
+    val uncheckedCheckmarkColor: Color,
+    val checkedBorderColor: Color,
+    val uncheckedBorderColor: Color,
+)
+
+/**
+ * Contains the default values used by [Checkbox].
+ */
 object CheckboxDefaults {
+    /**
+     * Creates a [CheckboxColors] with the default shadcn-style color scheme.
+     *
+     * @return A [CheckboxColors] instance using the current theme's color palette.
+     */
     @Composable
     fun colors(): CheckboxColors {
         val styles = MaterialTheme.styles
         return CheckboxColors(
-            styles.primary,
-            Color.Transparent,
-            styles.muted,
-            styles.foreground,
-            styles.primaryForeground,
-            Color.Transparent,
-            styles.primary,
-            styles.input
+            checkedColor = styles.primary,
+            uncheckedColor = Color.Transparent,
+            disabledColor = styles.muted,
+            disabledCheckmarkColor = styles.foreground,
+            checkedCheckmarkColor = styles.primaryForeground,
+            uncheckedCheckmarkColor = Color.Transparent,
+            checkedBorderColor = styles.primary,
+            uncheckedBorderColor = styles.input
         )
     }
 }
