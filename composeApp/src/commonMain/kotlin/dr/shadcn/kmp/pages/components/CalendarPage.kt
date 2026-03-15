@@ -18,6 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.shadcn.ui.components.Calendar
 import com.shadcn.ui.components.CalendarDefaults
+import com.shadcn.ui.components.CalendarSelectionMode
+import com.shadcn.ui.components.DateRange
+import com.shadcn.ui.components.DateRangePicker
 import com.shadcn.ui.components.DateSelectionMode
 import com.shadcn.ui.kmp.format
 import com.shadcn.ui.themes.styles
@@ -32,6 +35,9 @@ fun CalendarPage() {
     var customDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
     var selectedDatePast by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
     var selectedDateFuture by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
+    var selectedRange by remember { mutableStateOf<DateRange?>(null) }
+    var selectedRangePicker by remember { mutableStateOf<DateRange?>(null) }
+    var selectedRangeFuture by remember { mutableStateOf<DateRange?>(null) }
     Layout {
         Text(
             "Calendar",
@@ -114,7 +120,74 @@ fun CalendarPage() {
             }
         }
 
-        ContentPageWithTitle("4. Custom calendar color") {
+        ContentPageWithTitle("4. Range calendar") {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Calendar(
+                    selectionMode = CalendarSelectionMode.Range(
+                        selectedRange = selectedRange,
+                        onRangeSelected = { range ->
+                            selectedRange = range
+                        }
+                    )
+                )
+
+                Text(
+                    text = if (selectedRange != null) {
+                        "Range: ${selectedRange!!.start.format("MMM dd, yyyy")} - ${selectedRange!!.end.format("MMM dd, yyyy")}"
+                    } else {
+                        "Range: None"
+                    },
+                    color = MaterialTheme.styles.foreground,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        ContentPageWithTitle("5. Date Range Picker") {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                DateRangePicker(
+                    selectedRange = selectedRangePicker,
+                    onRangeSelected = { range ->
+                        selectedRangePicker = range
+                    }
+                )
+            }
+        }
+
+        ContentPageWithTitle("6. Range calendar (future or today)") {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Calendar(
+                    selectionMode = CalendarSelectionMode.Range(
+                        selectedRange = selectedRangeFuture,
+                        onRangeSelected = { range ->
+                            selectedRangeFuture = range
+                        }
+                    ),
+                    dateSelectionMode = DateSelectionMode.FutureOrToday
+                )
+
+                Text(
+                    text = if (selectedRangeFuture != null) {
+                        "Booking: ${selectedRangeFuture!!.start.format("MMM dd, yyyy")} - ${selectedRangeFuture!!.end.format("MMM dd, yyyy")}"
+                    } else {
+                        "Booking: None"
+                    },
+                    color = MaterialTheme.styles.foreground,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        ContentPageWithTitle("7. Custom calendar color") {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)

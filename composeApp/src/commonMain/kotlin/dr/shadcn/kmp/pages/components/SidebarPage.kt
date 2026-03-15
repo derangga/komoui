@@ -8,7 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,16 +31,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
 import com.shadcn.ui.components.sidebar.SidebarFooter
 import com.shadcn.ui.components.sidebar.SidebarGroup
 import com.shadcn.ui.components.sidebar.SidebarGroupContent
+import com.shadcn.ui.components.sidebar.SidebarGroupLabel
 import com.shadcn.ui.components.sidebar.SidebarHeader
-import com.shadcn.ui.components.sidebar.SidebarLabel
 import com.shadcn.ui.components.sidebar.SidebarLayout
 import com.shadcn.ui.components.sidebar.SidebarMenu
+import com.shadcn.ui.components.sidebar.SidebarMenuBadge
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
+import com.shadcn.ui.components.sidebar.SidebarMenuSub
+import com.shadcn.ui.components.sidebar.SidebarMenuSubButton
 import com.shadcn.ui.components.sidebar.SidebarProvider
+import com.shadcn.ui.components.sidebar.SidebarSeparator
 import com.shadcn.ui.components.sidebar.SidebarTrigger
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.Content
@@ -48,19 +61,98 @@ fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick:
     )
     SidebarContent {
         SidebarGroup {
-            SidebarLabel("Navigation")
+            SidebarGroupLabel("Navigation")
             SidebarGroupContent {
                 SidebarMenu {
                     menus.forEach { item ->
+                        val icon: @Composable () -> Unit = {
+                            Icon(
+                                imageVector = when (item.title) {
+                                    "Dashboard" -> Icons.Default.Home
+                                    "Projects" -> Icons.Default.Star
+                                    else -> Icons.AutoMirrored.Filled.List
+                                },
+                                contentDescription = item.title,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.styles.sidebarForeground
+                            )
+                        }
                         SidebarMenuButton(
-                            text = item.title,
                             onClick = {
                                 onMenuClick(item.title)
                                 sidebarNav.navigate(item.route)
                             },
-                            isActive = selectedMenu == item.title
-                        )
+                            isActive = selectedMenu == item.title,
+                            icon = icon
+                        ) {
+                            Text(
+                                text = item.title,
+                                color = MaterialTheme.styles.sidebarForeground,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            if (item.title == "Tasks") {
+                                SidebarMenuBadge {
+                                    Text(
+                                        text = "3",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.styles.sidebarForeground.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                        }
                     }
+                }
+            }
+        }
+
+        SidebarSeparator()
+
+        SidebarGroup {
+            SidebarGroupLabel("Settings")
+            SidebarGroupContent {
+                SidebarMenu {
+                    SidebarMenuButton(
+                        text = "General",
+                        onClick = { },
+                        icon = {
+                            Icon(
+                                Icons.Default.Settings,
+                                contentDescription = "Settings",
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.styles.sidebarForeground
+                            )
+                        }
+                    )
+                    SidebarMenuSub {
+                        SidebarMenuSubButton(onClick = { }) {
+                            Text(
+                                text = "Profile",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.styles.sidebarForeground
+                            )
+                        }
+                        SidebarMenuSubButton(onClick = { }) {
+                            Text(
+                                text = "Notifications",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.styles.sidebarForeground
+                            )
+                        }
+                    }
+                    SidebarMenuButton(
+                        text = "Calendar",
+                        onClick = { },
+                        icon = {
+                            Icon(
+                                Icons.Default.DateRange,
+                                contentDescription = "Calendar",
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.styles.sidebarForeground
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -73,7 +165,10 @@ fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick:
 fun SidebarLayoutPage() {
     var selectedItem by remember { mutableStateOf("Dashboard") }
     val sidebarNav = rememberNavController()
-    SidebarProvider(defaultOpen = true) { // Start with sidebar open on desktop
+    SidebarProvider(
+        defaultOpen = true,
+        collapsible = SidebarCollapsible.Icon
+    ) {
         SidebarLayout(
             sidebarHeader = {
                 SidebarHeader {

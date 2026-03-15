@@ -69,6 +69,39 @@ enum class DateSelectionMode {
 }
 
 /**
+ * Represents a date range with a start and end date.
+ */
+data class DateRange(val start: LocalDate, val end: LocalDate)
+
+/**
+ * Defines the selection mode for the Calendar component.
+ */
+sealed interface CalendarSelectionMode {
+    /**
+     * Single date selection mode.
+     *
+     * @param selectedDate The currently selected date, or null if none.
+     * @param onDateSelected Callback invoked when a date is selected.
+     */
+    data class Single(
+        val selectedDate: LocalDate? = null,
+        val onDateSelected: (LocalDate) -> Unit
+    ) : CalendarSelectionMode
+
+    /**
+     * Range date selection mode. First click sets start, second click sets end.
+     * Clicking after a complete range resets and starts a new selection.
+     *
+     * @param selectedRange The currently selected date range, or null if none.
+     * @param onRangeSelected Callback invoked when a complete range is selected.
+     */
+    data class Range(
+        val selectedRange: DateRange? = null,
+        val onRangeSelected: (DateRange) -> Unit
+    ) : CalendarSelectionMode
+}
+
+/**
  * Helper data class to represent a year-month pair for calendar navigation.
  */
 data class YearMonth(val year: Int, val month: Month) {
@@ -201,7 +234,7 @@ private fun DayOfWeek.toSundayStartIndex(): Int = when (this) {
 
 /**
  * A Jetpack Compose Calendar component inspired by Shadcn UI.
- * Allows single date selection and month/year navigation via dropdowns.
+ * Backward-compatible overload that wraps single date selection into [CalendarSelectionMode.Single].
  *
  * @param modifier The modifier to be applied to the calendar container.
  * @param selectedDate The currently selected date. Null if no date is selected.
@@ -210,12 +243,42 @@ private fun DayOfWeek.toSundayStartIndex(): Int = when (this) {
  * @param dateSelectionMode Defines which dates are clickable (All, PastOrToday, FutureOrToday).
  * @param colors [CalendarStyle] that will be used to resolve the colors used for this calendar in
  */
-@OptIn(ExperimentalTime::class)
 @Composable
 fun Calendar(
     modifier: Modifier = Modifier,
     selectedDate: LocalDate? = null,
     onDateSelected: (LocalDate) -> Unit,
+    initialMonth: YearMonth = YearMonth.now(),
+    dateSelectionMode: DateSelectionMode = DateSelectionMode.All,
+    colors: CalendarStyle = CalendarDefaults.colors()
+) {
+    Calendar(
+        modifier = modifier,
+        selectionMode = CalendarSelectionMode.Single(
+            selectedDate = selectedDate,
+            onDateSelected = onDateSelected
+        ),
+        initialMonth = initialMonth,
+        dateSelectionMode = dateSelectionMode,
+        colors = colors
+    )
+}
+
+/**
+ * A Jetpack Compose Calendar component inspired by Shadcn UI.
+ * Supports single date selection and range date selection via [CalendarSelectionMode].
+ *
+ * @param modifier The modifier to be applied to the calendar container.
+ * @param selectionMode The selection mode (single or range).
+ * @param initialMonth The month to display initially. Defaults to current month.
+ * @param dateSelectionMode Defines which dates are clickable (All, PastOrToday, FutureOrToday).
+ * @param colors [CalendarStyle] that will be used to resolve the colors used for this calendar in
+ */
+@OptIn(ExperimentalTime::class)
+@Composable
+fun Calendar(
+    modifier: Modifier = Modifier,
+    selectionMode: CalendarSelectionMode,
     initialMonth: YearMonth = YearMonth.now(),
     dateSelectionMode: DateSelectionMode = DateSelectionMode.All,
     colors: CalendarStyle = CalendarDefaults.colors()
@@ -229,6 +292,26 @@ fun Calendar(
 
     var showMonthPicker by remember { mutableStateOf(false) }
     var showYearPicker by remember { mutableStateOf(false) }
+
+    // Range selection internal state
+    var rangeStart by remember { mutableStateOf<LocalDate?>(null) }
+    var rangeEnd by remember { mutableStateOf<LocalDate?>(null) }
+    var rangeComplete by remember { mutableStateOf(false) }
+
+    // Sync internal range state with external selectedRange
+    if (selectionMode is CalendarSelectionMode.Range) {
+        LaunchedEffect(selectionMode.selectedRange) {
+            if (selectionMode.selectedRange != null) {
+                rangeStart = selectionMode.selectedRange.start
+                rangeEnd = selectionMode.selectedRange.end
+                rangeComplete = true
+            } else {
+                rangeStart = null
+                rangeEnd = null
+                rangeComplete = false
+            }
+        }
+    }
 
     // Weekday names (e.g., "Sun", "Mon")
     val weekdays = remember {
@@ -404,7 +487,22 @@ fun Calendar(
                                 }
                             }
 
-                            val isSelected = date == selectedDate
+                            // Determine selection state based on mode
+                            val isSelected = when (selectionMode) {
+                                is CalendarSelectionMode.Single -> date == selectionMode.selectedDate
+                                is CalendarSelectionMode.Range -> false // handled separately
+                            }
+
+                            // Range state calculations
+                            val isRangeStart = selectionMode is CalendarSelectionMode.Range &&
+                                    rangeStart != null && date == rangeStart
+                            val isRangeEnd = selectionMode is CalendarSelectionMode.Range &&
+                                    rangeEnd != null && date == rangeEnd
+                            val isInRange = selectionMode is CalendarSelectionMode.Range &&
+                                    rangeStart != null && rangeEnd != null &&
+                                    date > rangeStart!! && date < rangeEnd!!
+                            val isSingleDayRange = isRangeStart && isRangeEnd
+
                             val isToday = date == today
 
                             // Logic for date clickability based on dateSelectionMode
@@ -417,6 +515,30 @@ fun Calendar(
                             val interactionSource = remember(date) { MutableInteractionSource() }
                             val isPressed = interactionSource.collectIsPressedAsState().value
 
+                            // Determine shape based on range position
+                            val shape = when {
+                                selectionMode is CalendarSelectionMode.Range && (isRangeStart || isRangeEnd || isInRange) -> {
+                                    when {
+                                        isSingleDayRange -> RoundedCornerShape(radius.sm)
+                                        isRangeStart -> RoundedCornerShape(
+                                            topStart = radius.sm,
+                                            bottomStart = radius.sm,
+                                            topEnd = 0.dp,
+                                            bottomEnd = 0.dp
+                                        )
+                                        isRangeEnd -> RoundedCornerShape(
+                                            topStart = 0.dp,
+                                            bottomStart = 0.dp,
+                                            topEnd = radius.sm,
+                                            bottomEnd = radius.sm
+                                        )
+                                        isInRange -> RoundedCornerShape(0.dp)
+                                        else -> RoundedCornerShape(radius.sm)
+                                    }
+                                }
+                                else -> RoundedCornerShape(radius.sm)
+                            }
+
                             // Only animate for press state; use direct values for other states
                             val backgroundColor = if (isPressed && isClickable) {
                                 animateColorAsState(
@@ -427,6 +549,9 @@ fun Calendar(
                             } else {
                                 when {
                                     isSelected -> cellBgStyle.selectedDate
+                                    isSingleDayRange -> cellBgStyle.rangeEndpointBg
+                                    isRangeStart || isRangeEnd -> cellBgStyle.rangeEndpointBg
+                                    isInRange -> cellBgStyle.inRangeBg
                                     isToday && isCurrentMonth -> cellBgStyle.todayUnselectedBg
                                     else -> cellBgStyle.defaultDateCell
                                 }
@@ -434,6 +559,9 @@ fun Calendar(
 
                             val textColor = when {
                                 isSelected -> cellTextStyle.selectedDate
+                                isSingleDayRange -> cellTextStyle.rangeEndpointText
+                                isRangeStart || isRangeEnd -> cellTextStyle.rangeEndpointText
+                                isInRange -> cellTextStyle.inRangeText
                                 isToday && isCurrentMonth -> cellTextStyle.todayUnselected
                                 isCurrentMonth && isClickable -> cellTextStyle.currentMonthUnselected
                                 isCurrentMonth -> {
@@ -453,7 +581,8 @@ fun Calendar(
                                 else -> cellTextStyle.previousAndNextDateMonthDisabled
                             }
 
-                            val textStyle = if (isSelected || (isToday && isCurrentMonth)) {
+                            val isRangeHighlighted = isRangeStart || isRangeEnd || isInRange
+                            val textStyle = if (isSelected || isRangeHighlighted || (isToday && isCurrentMonth)) {
                                 dayTextStyleBold
                             } else {
                                 dayTextStyleNormal
@@ -463,14 +592,40 @@ fun Calendar(
                                 modifier = Modifier
                                     .weight(1f)
                                     .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(radius.sm))
+                                    .clip(shape)
                                     .background(backgroundColor)
                                     .clickable(
                                         enabled = isClickable,
                                         interactionSource = interactionSource,
                                         indication = null
                                     ) {
-                                        onDateSelected(date)
+                                        when (selectionMode) {
+                                            is CalendarSelectionMode.Single -> {
+                                                selectionMode.onDateSelected(date)
+                                            }
+                                            is CalendarSelectionMode.Range -> {
+                                                if (rangeComplete || rangeStart == null) {
+                                                    // Start new range
+                                                    rangeStart = date
+                                                    rangeEnd = date
+                                                    rangeComplete = false
+                                                } else {
+                                                    // Complete the range
+                                                    val start = rangeStart!!
+                                                    if (date < start) {
+                                                        // Auto-swap: clicked date becomes start
+                                                        rangeEnd = start
+                                                        rangeStart = date
+                                                    } else {
+                                                        rangeEnd = date
+                                                    }
+                                                    rangeComplete = true
+                                                    selectionMode.onRangeSelected(
+                                                        DateRange(rangeStart!!, rangeEnd!!)
+                                                    )
+                                                }
+                                            }
+                                        }
                                         // Navigate to the selected date's month if it's not current month
                                         if (!isCurrentMonth) {
                                             currentMonth = YearMonth.from(date)
@@ -682,7 +837,9 @@ data class DateCellBackgroundStyle(
     val selectedDate: Color,
     val todayUnselectedBg: Color,
     val onPressed: Color,
-    val defaultDateCell: Color
+    val defaultDateCell: Color,
+    val rangeEndpointBg: Color = Color.Unspecified,
+    val inRangeBg: Color = Color.Unspecified
 )
 
 data class DateCellTextStyle(
@@ -692,6 +849,8 @@ data class DateCellTextStyle(
     val currentMonthDisabled: Color,
     val previousAndNextDateMonth: Color,
     val previousAndNextDateMonthDisabled: Color,
+    val rangeEndpointText: Color = Color.Unspecified,
+    val inRangeText: Color = Color.Unspecified
 )
 
 data class SelectorDialogStyle(
@@ -718,7 +877,9 @@ object CalendarDefaults {
                 selectedDate = colors.primary,
                 todayUnselectedBg = colors.muted,
                 onPressed = colors.accent,
-                defaultDateCell = Color.Transparent
+                defaultDateCell = Color.Transparent,
+                rangeEndpointBg = colors.primary,
+                inRangeBg = colors.accent
             ),
             dateCellTextStyle = DateCellTextStyle(
                 selectedDate = colors.primaryForeground,
@@ -726,7 +887,9 @@ object CalendarDefaults {
                 currentMonthUnselected = colors.foreground,
                 currentMonthDisabled = colors.mutedForeground.copy(alpha = 0.4f),
                 previousAndNextDateMonth = colors.mutedForeground,
-                previousAndNextDateMonthDisabled = colors.mutedForeground.copy(alpha = 0.3f)
+                previousAndNextDateMonthDisabled = colors.mutedForeground.copy(alpha = 0.3f),
+                rangeEndpointText = colors.primaryForeground,
+                inRangeText = colors.accentForeground
             ),
             dialogStyle = SelectorDialogStyle(
                 selectedBg = colors.primary,

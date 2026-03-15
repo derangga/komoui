@@ -26,11 +26,11 @@ object LightStyles : ShadcnStyles {
     override val input: Color = Color(0xFFE5E5E5)
     override val ring: Color = Color(0xFFA1A1A1)
 
-    override val chart1: Color = Color(0xFFB2D4FF)
-    override val chart2: Color = Color(0xFF3A81F6)
-    override val chart3: Color = Color(0xFF2563EF)
-    override val chart4: Color = Color(0xFF1A4EDA)
-    override val chart5: Color = Color(0xFF1F3FAD)
+    override val chart1: Color = Color(0xFFE76F51)
+    override val chart2: Color = Color(0xFF2A9D8F)
+    override val chart3: Color = Color(0xFF264653)
+    override val chart4: Color = Color(0xFFE9C46A)
+    override val chart5: Color = Color(0xFFF4A261)
 
     override val sidebar: Color = Color(0xFFFAFAFA)
     override val sidebarForeground: Color = Color(0xFF0A0A0A)
