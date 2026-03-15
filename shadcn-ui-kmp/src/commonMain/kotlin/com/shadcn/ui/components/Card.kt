@@ -3,8 +3,11 @@ package com.shadcn.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,7 +54,7 @@ fun Card(
             modifier = Modifier
                 .background(
                     color = MaterialTheme.styles.card,
-                    shape = RoundedCornerShape(MaterialTheme.radius.lg)
+                    shape = RoundedCornerShape(radius)
                 )
                 .then(modifier), content = content
         )
@@ -59,7 +62,7 @@ fun Card(
 }
 
 /**
- * Composable for the header section of a ShadcnCard.
+ * Composable for the header section of a Card.
  *
  * @param modifier The modifier to be applied to the header.
  * @param content The composable content of the header.
@@ -100,12 +103,14 @@ fun CardTitle(
             fontSize = 18.sp
         )
     ) {
-        content()
+        Column(modifier = modifier) {
+            content()
+        }
     }
 }
 
 /**
- * Composable for the description of a ShadcnCard.
+ * Composable for the description of a Card.
  * This should be used within [CardHeader].
  *
  * @param modifier The modifier to be applied to the description text.
@@ -152,23 +157,26 @@ fun CardContent(
 }
 
 /**
- * Composable for the footer section of a ShadcnCard.
+ * Composable for the footer section of a Card.
+ * Uses a horizontal [Row] layout, matching shadcn/ui's footer behavior.
  *
  * @param modifier The modifier to be applied to the footer.
+ * @param horizontalArrangement The horizontal arrangement of the footer content.
  * @param content The composable content of the footer.
  */
 @Composable
 fun CardFooter(
     modifier: Modifier = Modifier,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    content: @Composable ColumnScope.() -> Unit
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    content: @Composable RowScope.() -> Unit
 ) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .then(modifier),
-        horizontalAlignment = horizontalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        verticalAlignment = Alignment.CenterVertically,
         content = content
     )
 }

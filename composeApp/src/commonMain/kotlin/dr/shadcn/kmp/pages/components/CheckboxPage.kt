@@ -143,8 +143,8 @@ fun CheckboxPage() {
                         checked = checkedState6,
                         onCheckedChange = { checkedState6 = it },
                         colors = CheckboxDefaults.colors().copy(
-                            checkedColors = MaterialTheme.styles.chart3,
-                            checkedBorderColors = MaterialTheme.styles.chart3
+                            checkedColor = MaterialTheme.styles.chart3,
+                            checkedBorderColor = MaterialTheme.styles.chart3
                         )
                     )
                     Column {

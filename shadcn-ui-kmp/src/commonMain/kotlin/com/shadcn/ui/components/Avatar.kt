@@ -1,5 +1,6 @@
 package com.shadcn.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
+import com.shadcn.ui.themes.ShadcnStyles
 import com.shadcn.ui.themes.styles
 
 /**
@@ -61,49 +63,62 @@ fun Avatar(
             .then(modifier),
         contentAlignment = Alignment.Center
     ) {
-        SubcomposeAsyncImage(
-            model = model,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = contentScale,
-            contentDescription = contentDescription,
-            loading = {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (loadingContent != null) {
-                        loadingContent()
-                    } else {
-                        Text(
-                            text = fallbackText,
-                            style = TextStyle(
-                                color = styles.mutedForeground,
-                                fontSize = (size.value * 0.4).sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        )
-                    }
-                }
-            },
-            error = {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (errorContent != null) {
-                        errorContent()
-                    } else {
-                        Text(
-                            text = fallbackText,
-                            style = TextStyle(
-                                color = styles.mutedForeground,
-                                fontSize = (size.value * 0.4).sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        )
-                    }
-                }
+        if (model == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(styles.muted),
+                contentAlignment = Alignment.Center
+            ) {
+                AvatarFallbackText(fallbackText, size, styles)
             }
-        )
+        } else {
+            SubcomposeAsyncImage(
+                model = model,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = contentScale,
+                contentDescription = contentDescription,
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(styles.muted),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (loadingContent != null) {
+                            loadingContent()
+                        } else {
+                            AvatarFallbackText(fallbackText, size, styles)
+                        }
+                    }
+                },
+                error = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(styles.muted),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (errorContent != null) {
+                            errorContent()
+                        } else {
+                            AvatarFallbackText(fallbackText, size, styles)
+                        }
+                    }
+                }
+            )
+        }
     }
+}
+
+@Composable
+private fun AvatarFallbackText(fallbackText: String, size: Dp, styles: ShadcnStyles) {
+    Text(
+        text = fallbackText,
+        style = TextStyle(
+            color = styles.mutedForeground,
+            fontSize = (size.value * 0.4).sp,
+            fontWeight = FontWeight.Medium
+        )
+    )
 }

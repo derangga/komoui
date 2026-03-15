@@ -6,6 +6,16 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+/**
+ * A [SnackbarHost] wrapper that renders [SonnerVisualsImpl] visuals using the [Sonner] composable.
+ *
+ * When the snackbar data contains [SonnerVisualsImpl], it delegates rendering to [Sonner].
+ * For all other visuals, it falls back to the default Material 3 [Snackbar].
+ *
+ * @param hostState The [SnackbarHostState] used to control snackbar display.
+ * @param modifier The [Modifier] to apply to the host.
+ */
+
 @Composable
 fun SonnerHost(
     hostState: SnackbarHostState,
