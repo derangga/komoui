@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,6 +46,7 @@ fun CarouselPage() {
         ContentPageWithTitle("1. Basic carousel") {
             Carousel(
                 itemCount = verticalAsset.size,
+                containerModifier = Modifier.width(400.dp),
                 modifier = Modifier.fillMaxWidth(),
                 showIndicator = true
             ) { position ->
@@ -62,6 +64,7 @@ fun CarouselPage() {
         ContentPageWithTitle("2. Carousel with auto scroll") {
             Carousel(
                 itemCount = verticalAsset.size,
+                containerModifier = Modifier.width(400.dp),
                 autoScroll = true,
                 showIndicator = true,
                 autoScrollDelayMillis = 2500L, // Shorter interval for demo

@@ -2,6 +2,8 @@ package dr.shadcn.kmp.pages.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.shadcn.ui.components.Button
 import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.ButtonVariant
+import com.shadcn.ui.components.IconButton
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.components.ContentPageWithTitle
 import dr.shadcn.kmp.components.Layout
@@ -72,22 +75,16 @@ fun ButtonPage() {
             ) { Text("Outline") }
         }
 
-        ContentPageWithTitle("6. Button with Loading") {
+        ContentPageWithTitle("7. Button with Loading") {
             Button(
-                enabled = false,
                 onClick = { },
+                loading = true,
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.styles.background,
-                    strokeWidth = 2.dp
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Loading")
+                Text("Please wait")
             }
         }
 
-        ContentPageWithTitle("7. Button Icon") {
+        ContentPageWithTitle("8. Button Icon") {
             Button(
                 onClick = { },
                 size = ButtonSize.Icon,
@@ -97,7 +94,7 @@ fun ButtonPage() {
             }
         }
 
-        ContentPageWithTitle("8. Button with Icon") {
+        ContentPageWithTitle("9. Button with Icon") {
             Button(
                 onClick = { },
                 variant = ButtonVariant.Outline
@@ -106,6 +103,37 @@ fun ButtonPage() {
                 Spacer(Modifier.width(8.dp))
                 Text("Account")
             }
+        }
+
+        ContentPageWithTitle("10. Button Xs Size") {
+            Button(
+                onClick = { },
+                size = ButtonSize.Xs,
+            ) { Text("Extra Small") }
+        }
+
+        ContentPageWithTitle("11. IconButton") {
+            IconButton(
+                onClick = { },
+            ) {
+                Icon(Icons.Default.Favorite, contentDescription = "Favorite")
+            }
+        }
+
+        ContentPageWithTitle("12. IconButton Small") {
+            IconButton(
+                onClick = { },
+                size = ButtonSize.IconSm,
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+        }
+
+        ContentPageWithTitle("13. Button Full Width") {
+            Button(
+                onClick = { },
+                fullWidth = true,
+            ) { Text("Full Width Button") }
         }
     }
 }

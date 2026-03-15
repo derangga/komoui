@@ -19,11 +19,16 @@ val LocalSidebarState = compositionLocalOf<SidebarState> {
 }
 
 /**
- * Provider for sidebar state management
+ * Provider for sidebar state management.
+ *
+ * @param defaultOpen Whether the sidebar starts open on desktop. Always starts closed on mobile.
+ * @param collapsible The collapsible behavior of the sidebar.
+ * @param content The content to be wrapped with sidebar state.
  */
 @Composable
 fun SidebarProvider(
     defaultOpen: Boolean = false,
+    collapsible: SidebarCollapsible = SidebarCollapsible.Offcanvas,
     content: @Composable () -> Unit
 ) {
 
@@ -42,14 +47,18 @@ fun SidebarProvider(
         if (isMobile) {
             isOpen = false
         }
-        // Remove auto-open for desktop to allow hiding
     }
 
-    val sidebarState = remember(isOpen, isMobile) {
+    val sidebarState = remember(isOpen, isMobile, collapsible) {
         SidebarState(
             isOpen = isOpen,
             isMobile = isMobile,
-            toggleSidebar = { isOpen = !isOpen },
+            collapsible = collapsible,
+            toggleSidebar = {
+                if (collapsible != SidebarCollapsible.None) {
+                    isOpen = !isOpen
+                }
+            },
             closeSidebar = { isOpen = false }
         )
     }

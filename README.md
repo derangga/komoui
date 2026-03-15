@@ -22,7 +22,63 @@ For more information on the original shadcn/ui, please visit the [official shadc
 
 ## Installation
 
-// TODO: Add installation instructions
+### 1. Add Dependency
+
+Add the library to your module's `build.gradle` file. You can find the latest version in the [release tags](https://github.com/derangga/shadcn-ui-kmp/tags).
+
+**Groovy**
+```gradle
+dependencies {
+    implementation 'io.github.derangga:shadcn-ui-kmp:0.2.0'
+}
+```
+
+**Kotlin DSL**
+```kts
+dependencies {
+    implementation("io.github.derangga:shadcn-ui-kmp:0.2.0")
+}
+```
+
+### 2. Setup Theme
+
+Replace your existing theme with `ShadcnTheme` in your `MainActivity`:
+
+```kotlin
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ShadcnTheme {
+                // your screen navigation or components
+            }
+        }
+    }
+}
+```
+
+### 3. Start Using Components
+
+Import and use any available component:
+
+```kotlin
+import com.shadcn.ui.components.Button
+import com.shadcn.ui.components.Input
+
+@Composable
+fun MyScreen() {
+    var text by remember { mutableStateOf("") }
+
+    Input(
+        value = text,
+        onValueChange = { text = it },
+        placeholder = "Enter your name"
+    )
+    Button(onClick = { /* handle click */ }) {
+        Text("Submit")
+    }
+}
+```
 
 ## Usage
 

@@ -58,7 +58,7 @@ import com.shadcn.ui.components.sidebar.SidebarFooter
 import com.shadcn.ui.components.sidebar.SidebarGroup
 import com.shadcn.ui.components.sidebar.SidebarGroupContent
 import com.shadcn.ui.components.sidebar.SidebarHeader
-import com.shadcn.ui.components.sidebar.SidebarLabel
+import com.shadcn.ui.components.sidebar.SidebarGroupLabel
 import com.shadcn.ui.components.sidebar.SidebarLayout
 import com.shadcn.ui.components.sidebar.SidebarMenu
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
@@ -82,7 +82,7 @@ fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick:
             }
         )
         SidebarGroup {
-            SidebarLabel("Components")
+            SidebarGroupLabel("Components")
             SidebarGroupContent {
                 SidebarMenu {
                     menus.forEach { item ->

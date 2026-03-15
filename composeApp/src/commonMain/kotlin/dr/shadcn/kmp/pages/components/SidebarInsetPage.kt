@@ -11,7 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,16 +33,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.shadcn.ui.components.sidebar.LocalSidebarState
 import com.shadcn.ui.components.sidebar.Sidebar
+import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
 import com.shadcn.ui.components.sidebar.SidebarFooter
 import com.shadcn.ui.components.sidebar.SidebarGroup
 import com.shadcn.ui.components.sidebar.SidebarGroupContent
+import com.shadcn.ui.components.sidebar.SidebarGroupLabel
 import com.shadcn.ui.components.sidebar.SidebarHeader
 import com.shadcn.ui.components.sidebar.SidebarInset
-import com.shadcn.ui.components.sidebar.SidebarLabel
 import com.shadcn.ui.components.sidebar.SidebarMenu
+import com.shadcn.ui.components.sidebar.SidebarMenuBadge
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
+import com.shadcn.ui.components.sidebar.SidebarMenuSkeleton
 import com.shadcn.ui.components.sidebar.SidebarProvider
+import com.shadcn.ui.components.sidebar.SidebarSeparator
 import com.shadcn.ui.components.sidebar.SidebarTrigger
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.Content
@@ -52,6 +62,7 @@ fun SidebarInsetPage() {
     )
     var selectedItem by remember { mutableStateOf("Dashboard") }
     val sidebarNav = rememberNavController()
+
     // Define sidebar content once to avoid duplication
     val sidebarContent: @Composable () -> Unit = {
         SidebarContent {
@@ -65,18 +76,59 @@ fun SidebarInsetPage() {
             }
 
             SidebarGroup {
-                SidebarLabel("Navigation")
+                SidebarGroupLabel("Navigation")
                 SidebarGroupContent {
                     SidebarMenu {
                         menus.forEach { item ->
                             SidebarMenuButton(
-                                text = item.title,
                                 onClick = {
                                     selectedItem = item.title
                                     sidebarNav.navigate(item.route)
                                 },
-                                isActive = selectedItem == item.title
-                            )
+                                isActive = selectedItem == item.title,
+                                icon = {
+                                    Icon(
+                                        imageVector = when (item.title) {
+                                            "Dashboard" -> Icons.Default.Home
+                                            "Projects" -> Icons.Default.Star
+                                            else -> Icons.AutoMirrored.Filled.List
+                                        },
+                                        contentDescription = item.title,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.styles.sidebarForeground
+                                    )
+                                }
+                            ) {
+                                Text(
+                                    text = item.title,
+                                    color = MaterialTheme.styles.sidebarForeground,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                if (item.title == "Projects") {
+                                    SidebarMenuBadge {
+                                        Text(
+                                            text = "5",
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.styles.sidebarForeground.copy(alpha = 0.7f)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            SidebarSeparator()
+
+            SidebarGroup {
+                SidebarGroupLabel("Loading...")
+                SidebarGroupContent {
+                    SidebarMenu {
+                        repeat(3) {
+                            SidebarMenuSkeleton()
                         }
                     }
                 }
@@ -94,32 +146,24 @@ fun SidebarInsetPage() {
         }
     }
 
-    SidebarProvider(defaultOpen = false) {
+    SidebarProvider(
+        defaultOpen = false,
+        collapsible = SidebarCollapsible.Icon
+    ) {
         val sidebarState = LocalSidebarState.current
 
         // Root layout
         Row(modifier = Modifier.fillMaxSize()) {
-            // Desktop: Place sidebar manually when open
+            // Desktop: Place sidebar manually when open or in icon mode
             if (!sidebarState.isMobile) {
-                AnimatedVisibility(
-                    visible = sidebarState.isOpen,
-                ) {
-                    Sidebar {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(280.dp)
-                                .background(MaterialTheme.styles.sidebar)
-                        ) {
-                            sidebarContent()
-                        }
-                    }
+                Sidebar {
+                    sidebarContent()
                 }
             }
 
             // Main content with SidebarInset
             SidebarInset(
-                modifier = Modifier.weight(1f), // Takes remaining space
+                modifier = Modifier.weight(1f),
                 sidebarContent = sidebarContent,
                 content = {
                     Column(

@@ -1,5 +1,6 @@
 package com.shadcn.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,26 +15,42 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.animateDpAsState
 import com.shadcn.ui.themes.styles
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
 /**
- * A Jetpack Compose Carousel component inspired by Shadcn UI, utilizing HorizontalPager for snapping behavior.
+ * Orientation for the Carousel component.
+ */
+enum class CarouselOrientation {
+    Horizontal,
+    Vertical
+}
+
+/**
+ * A Jetpack Compose Carousel component inspired by Shadcn UI, utilizing HorizontalPager/VerticalPager for snapping behavior.
  *
- * @param modifier The modifier to be applied to the carousel container.
+ * @param containerModifier The modifier to be applied to the outer carousel container (Column).
+ * @param modifier The modifier to be applied to the pager.
+ * @param state Optional [PagerState] for external control of the pager (e.g., programmatic scrolling). If null, an internal state is created.
  * @param autoScroll If true, the carousel will automatically scroll to the next page after a delay.
  * @param autoScrollDelayMillis The delay in milliseconds between auto-scrolls. Only effective if [autoScroll] is true.
+ * @param orientation The scroll orientation of the carousel. Defaults to [CarouselOrientation.Horizontal].
  * @param componentSpacing The spacing between carousel item and indicator components.
  * @param contentPadding The padding to be applied to the content of the pager.
  * @param showIndicator Whether to show the carousel indicator.
@@ -47,9 +63,12 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun Carousel(
+    containerModifier: Modifier = Modifier,
     modifier: Modifier = Modifier,
+    state: PagerState? = null,
     autoScroll: Boolean = false,
     autoScrollDelayMillis: Long = 3000,
+    orientation: CarouselOrientation = CarouselOrientation.Horizontal,
     componentSpacing: Dp = 8.dp,
     contentPadding: PaddingValues = PaddingValues(12.dp, 0.dp),
     showIndicator: Boolean = false,
@@ -60,7 +79,7 @@ fun Carousel(
     onItemChanged: ((Int) -> Unit)? = null,
     content: @Composable PagerScope.(position: Int) -> Unit
 ) {
-    val pagerState = rememberPagerState { itemCount }
+    val pagerState = state ?: rememberPagerState { itemCount }
 
     // Invoke onItemChanged callback when the current page changes
     LaunchedEffect(pagerState.currentPage) {
@@ -68,30 +87,44 @@ fun Carousel(
     }
 
     if (autoScroll && itemCount > 1) {
-        LaunchedEffect(Unit) {
-            while (true) {
-                delay(autoScrollDelayMillis)
-                val nextPage = (pagerState.currentPage + 1) % itemCount
-                pagerState.animateScrollToPage(nextPage)
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.isScrollInProgress }.collectLatest { scrolling ->
+                if (!scrolling) {
+                    while (true) {
+                        delay(autoScrollDelayMillis)
+                        val nextPage = (pagerState.currentPage + 1) % itemCount
+                        pagerState.animateScrollToPage(nextPage)
+                    }
+                }
             }
         }
     }
 
     Column(
+        modifier = containerModifier,
         verticalArrangement = Arrangement.spacedBy(componentSpacing)
     ) {
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = contentPadding,
-                pageSize = pageSize,
-                pageSpacing = itemSpacing,
-                pageContent = content,
-            )
+        when (orientation) {
+            CarouselOrientation.Horizontal -> {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = modifier,
+                    contentPadding = contentPadding,
+                    pageSize = pageSize,
+                    pageSpacing = itemSpacing,
+                    pageContent = content,
+                )
+            }
+            CarouselOrientation.Vertical -> {
+                VerticalPager(
+                    state = pagerState,
+                    modifier = modifier,
+                    contentPadding = contentPadding,
+                    pageSize = pageSize,
+                    pageSpacing = itemSpacing,
+                    pageContent = content,
+                )
+            }
         }
 
         if (showIndicator) {
@@ -101,31 +134,35 @@ fun Carousel(
 }
 
 @Composable
-fun CarouselIndicator(state: PagerState, size: Int, style: IndicatorStyle) {
+internal fun CarouselIndicator(state: PagerState, size: Int, style: IndicatorStyle) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         repeat(size) {
-            val dimens = if (state.currentPage == it) {
-                style.activeSize
-            } else {
-                style.inactiveSize
-            }
-            Spacer(
+            val isActive = state.currentPage == it
+            val dimens by animateDpAsState(
+                targetValue = if (isActive) style.activeSize else style.inactiveSize
+            )
+            val color by animateColorAsState(
+                targetValue = if (isActive) style.activeColor else style.inactiveColor
+            )
+            Box(
                 modifier = Modifier
                     .padding(style.spacing)
-                    .size(dimens)
-                    .background(
-                        color = if (state.currentPage == it) {
-                            style.activeColor
-                        } else {
-                            style.inactiveColor
-                        },
-                        shape = style.shape
-                    )
-            )
+                    .size(style.activeSize),
+                contentAlignment = Alignment.Center
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .size(dimens)
+                        .background(
+                            color = color,
+                            shape = style.shape
+                        )
+                )
+            }
         }
     }
 }

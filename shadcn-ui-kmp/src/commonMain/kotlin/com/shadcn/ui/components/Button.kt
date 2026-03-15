@@ -9,11 +9,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.TextButton
@@ -43,8 +49,10 @@ enum class ButtonVariant {
 enum class ButtonSize {
     Default,
     Sm,
+    Xs,
     Lg,
-    Icon
+    Icon,
+    IconSm
 }
 
 @Composable
@@ -153,20 +161,22 @@ internal fun getButtonColors(
 }
 
 /**
- * @param onClick: () -> Unit - Lambda function to be invoked when the button is clicked.
- * @param modifier: Modifier (optional, default: Modifier) - Modifier to be applied to the button.
- * @param variant: ButtonVariant (optional, default: ButtonVariant.Default) - The visual style of
- *      the button. See ButtonVariant enum for available options.
- * @param size: ButtonSize (optional, default: ButtonSize.Default) - The size of the button,
- *      affecting its padding and minimum height/width. See ButtonSize enum for available options.
- * @param enabled: Boolean (optional, default: true) - Controls the enabled state of the button.
+ * A composable button component inspired by shadcn/ui.
+ *
+ * @param onClick Lambda function to be invoked when the button is clicked.
+ * @param modifier Modifier to be applied to the button.
+ * @param variant The visual style of the button. See [ButtonVariant] for available options.
+ * @param size The size of the button, affecting its padding and minimum height/width.
+ *      See [ButtonSize] for available options.
+ * @param enabled Controls the enabled state of the button.
  *      When false, the button will be visually disabled and will not respond to user input.
- * @param shape: Shape (optional, default: RoundedCornerShape(Radius.md)) - The shape of the
- *      button's container.
- * @param color: ButtonColors (optional, default: null) - Custom button colors. If not provided,
- * @param content: @Composable RowScope.() -> Unit - The content to be displayed inside the button.
- *      This is a composable lambda that has RowScope as its receiver, allowing for flexible
- *      layout of content within the button (e.g., text, icons).
+ * @param loading When true, the button becomes non-interactive and shows a loading spinner
+ *      before the content.
+ * @param fullWidth When true, the button fills the maximum available width.
+ * @param shape The shape of the button's container.
+ * @param contentPadding Custom content padding. When non-null, overrides the size-derived padding.
+ * @param color Custom button colors. If not provided, colors are derived from the variant.
+ * @param content The content to be displayed inside the button.
  */
 @Composable
 fun Button(
@@ -175,7 +185,10 @@ fun Button(
     variant: ButtonVariant = ButtonVariant.Default,
     size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
+    loading: Boolean = false,
+    fullWidth: Boolean = false,
     shape: Shape = RoundedCornerShape(MaterialTheme.radius.md),
+    contentPadding: PaddingValues? = null,
     color: ButtonColors? = null,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -190,24 +203,29 @@ fun Button(
         else -> null
     }
 
-    val contentPadding = when (size) {
+    val resolvedContentPadding = contentPadding ?: when (size) {
         ButtonSize.Default -> PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ButtonSize.Sm -> PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+        ButtonSize.Xs -> PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         ButtonSize.Lg -> PaddingValues(horizontal = 32.dp, vertical = 12.dp)
         ButtonSize.Icon -> PaddingValues(0.dp)
+        ButtonSize.IconSm -> PaddingValues(0.dp)
     }
 
     val minHeightModifier = when (size) {
         ButtonSize.Default -> Modifier.defaultMinSize(minHeight = 40.dp)
         ButtonSize.Sm -> Modifier.defaultMinSize(minHeight = 36.dp)
+        ButtonSize.Xs -> Modifier.defaultMinSize(minHeight = 32.dp)
         ButtonSize.Lg -> Modifier.defaultMinSize(minHeight = 44.dp)
         ButtonSize.Icon -> Modifier
             .defaultMinSize(minWidth = 36.dp, minHeight = 36.dp)
+        ButtonSize.IconSm -> Modifier
+            .defaultMinSize(minWidth = 28.dp, minHeight = 28.dp)
     }
 
     // Common text style for buttons
     val buttonTextStyle = TextStyle(
-        fontSize = 14.sp,
+        fontSize = if (size == ButtonSize.Xs) 12.sp else 14.sp,
         fontWeight = FontWeight.Medium
     )
 
@@ -218,35 +236,45 @@ fun Button(
         buttonTextStyle
     }
 
+    val isEnabled = enabled && !loading
+
+    val baseModifier = if (fullWidth) {
+        Modifier.then(minHeightModifier).fillMaxWidth().then(modifier)
+    } else {
+        Modifier.then(minHeightModifier).then(modifier)
+    }
+
     // Use TextButton for Ghost and Link variants to match behavior and remove default elevation
     if (variant == ButtonVariant.Ghost || variant == ButtonVariant.Link) {
         TextButton(
             onClick = onClick,
-            modifier = Modifier.then(minHeightModifier).then(modifier),
-            enabled = enabled,
+            modifier = baseModifier,
+            enabled = isEnabled,
             shape = shape,
             colors = color ?: buttonColors,
-            contentPadding = contentPadding,
+            contentPadding = resolvedContentPadding,
             interactionSource = interactionSource
         ) {
             ButtonContent(
                 textStyle = linkTextStyle,
+                loading = loading,
                 content = content
             )
         }
     } else {
         Button(
             onClick = onClick,
-            modifier = Modifier.then(minHeightModifier).then(modifier),
-            enabled = enabled,
+            modifier = baseModifier,
+            enabled = isEnabled,
             shape = shape,
             colors = color ?: buttonColors,
             border = borderStroke,
-            contentPadding = contentPadding,
+            contentPadding = resolvedContentPadding,
             interactionSource = interactionSource
         ) {
             ButtonContent(
                 textStyle = linkTextStyle,
+                loading = loading,
                 content = content
             )
         }
@@ -256,13 +284,59 @@ fun Button(
 @Composable
 private fun ButtonContent(
     content: @Composable RowScope.() -> Unit,
-    textStyle: TextStyle
+    textStyle: TextStyle,
+    loading: Boolean = false
 ) {
     ProvideTextStyle(textStyle) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
+        ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = LocalContentColor.current,
+                    strokeWidth = 2.dp
+                )
+                Spacer(Modifier.width(8.dp))
+            }
+            content()
+        }
     }
+}
+
+/**
+ * A convenience composable for icon-only buttons.
+ * Thin wrapper around [Button] with defaults suited for icon buttons.
+ *
+ * @param onClick Lambda function to be invoked when the button is clicked.
+ * @param modifier Modifier to be applied to the button.
+ * @param variant The visual style of the button. Defaults to [ButtonVariant.Ghost].
+ * @param size The size of the button. Defaults to [ButtonSize.Icon].
+ * @param enabled Controls the enabled state of the button.
+ * @param shape The shape of the button's container.
+ * @param color Custom button colors.
+ * @param content The icon content to be displayed inside the button.
+ */
+@Composable
+fun IconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    variant: ButtonVariant = ButtonVariant.Ghost,
+    size: ButtonSize = ButtonSize.Icon,
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(MaterialTheme.radius.md),
+    color: ButtonColors? = null,
+    content: @Composable RowScope.() -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        variant = variant,
+        size = size,
+        enabled = enabled,
+        shape = shape,
+        color = color,
+        content = content
+    )
 }
