@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "android-jetpack-compose": {
+      "source": "thebushidocollective/han",
+      "sourceType": "github",
+      "computedHash": "7c17e8d8ecfc7159fa18a4359cc0e53868134b6bfd28e825b5c5473d52987853"
+    }
+  }
+}
