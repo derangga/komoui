@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,12 +95,10 @@ fun DatePicker(
     val radius = MaterialTheme.radius
     var showCalendarPopup by remember { mutableStateOf(false) }
 
-    var inputWidthPx by remember { mutableIntStateOf(0) }
     var inputHeightPx by remember { mutableIntStateOf(0) }
     var inputXPositionPx by remember { mutableIntStateOf(0) }
     var inputYPositionPx by remember { mutableIntStateOf(0) }
 
-    val density = LocalDensity.current
     val formatter = dateTimeFormat ?: DateFormatter.ofPattern("MMM dd, yyyy")
     val formattedDate = selectedDate?.let { formatter.format(it) }
 
@@ -120,7 +117,6 @@ fun DatePicker(
                 .height(48.dp)
                 .onGloballyPositioned { coordinates ->
                     // Get the size and position of the input field
-                    inputWidthPx = coordinates.size.width
                     inputHeightPx = coordinates.size.height
                     val position = coordinates.parentLayoutCoordinates?.windowToLocal(coordinates.positionInWindow())
                     inputXPositionPx = position?.x?.roundToInt() ?: 0
@@ -173,7 +169,6 @@ fun DatePicker(
                         .background(themeColors.popover)
                 ) {
                     Calendar(
-                        modifier = Modifier.width(with(density) { inputWidthPx.toDp() }),
                         selectionMode = CalendarSelectionMode.Single(
                             selectedDate = selectedDate,
                             onDateSelected = { date ->
@@ -221,12 +216,10 @@ fun DateRangePicker(
     val radius = MaterialTheme.radius
     var showCalendarPopup by remember { mutableStateOf(false) }
 
-    var inputWidthPx by remember { mutableIntStateOf(0) }
     var inputHeightPx by remember { mutableIntStateOf(0) }
     var inputXPositionPx by remember { mutableIntStateOf(0) }
     var inputYPositionPx by remember { mutableIntStateOf(0) }
 
-    val density = LocalDensity.current
     val formatter = dateTimeFormat ?: DateFormatter.ofPattern("MMM dd, yyyy")
     val formattedRange = selectedRange?.let {
         "${formatter.format(it.start)} - ${formatter.format(it.end)}"
@@ -246,7 +239,6 @@ fun DateRangePicker(
                 .fillMaxWidth()
                 .height(48.dp)
                 .onGloballyPositioned { coordinates ->
-                    inputWidthPx = coordinates.size.width
                     inputHeightPx = coordinates.size.height
                     val position = coordinates.parentLayoutCoordinates?.windowToLocal(coordinates.positionInWindow())
                     inputXPositionPx = position?.x?.roundToInt() ?: 0
@@ -298,7 +290,6 @@ fun DateRangePicker(
                         .background(themeColors.popover)
                 ) {
                     Calendar(
-                        modifier = Modifier.width(with(density) { inputWidthPx.toDp() }),
                         selectionMode = CalendarSelectionMode.Range(
                             selectedRange = selectedRange,
                             onRangeSelected = { range ->
