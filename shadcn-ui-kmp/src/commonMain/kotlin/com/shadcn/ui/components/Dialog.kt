@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -80,13 +78,9 @@ fun Dialog(
                             modifier = Modifier
                                 .offset(y = (-16).dp, x = (16).dp),
                         ) {
-                            Button(
+                            IconButton(
                                 onClick = onDismissRequest,
-                                size = ButtonSize.Icon,
-                                variant = ButtonVariant.Ghost,
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .height(24.dp)
+                                size = ButtonSize.IconSm,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,

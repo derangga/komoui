@@ -166,13 +166,9 @@ fun Drawer(
                             modifier = Modifier
                                 .offset(y = (-12).dp),
                         ) {
-                            Button(
+                            IconButton(
                                 onClick = onDismissRequest,
-                                size = ButtonSize.Icon,
-                                variant = ButtonVariant.Ghost,
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .height(24.dp)
+                                size = ButtonSize.IconSm,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,

@@ -20,6 +20,8 @@ import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.components.ContentPageWithTitle
 import dr.shadcn.kmp.components.Layout
 
+private data class Country(val code: String, val name: String)
+
 @Composable
 fun SelectPage() {
     Layout {
@@ -87,6 +89,74 @@ fun SelectPage() {
                 )
                 Text(
                     text = "Selected Color: ${selectedColor ?: "None"}",
+                    color = MaterialTheme.styles.foreground,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        ContentPageWithTitle("3. Disabled select") {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Select(
+                    options = fruits,
+                    selectedOption = "Banana",
+                    onOptionSelected = {},
+                    modifier = Modifier.width(280.dp),
+                    enabled = false,
+                    placeholder = "Select a fruit..."
+                )
+            }
+        }
+
+        ContentPageWithTitle("4. Select with data class (generic)") {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val countries = remember {
+                    listOf(
+                        Country("US", "United States"),
+                        Country("GB", "United Kingdom"),
+                        Country("JP", "Japan"),
+                        Country("DE", "Germany"),
+                        Country("FR", "France")
+                    )
+                }
+                var selectedCountry by remember { mutableStateOf<Country?>(null) }
+
+                Select(
+                    options = countries,
+                    selectedOption = selectedCountry,
+                    onOptionSelected = { selectedCountry = it },
+                    label = { "${it.code} - ${it.name}" },
+                    modifier = Modifier.width(280.dp),
+                    placeholder = "Select a country..."
+                )
+                Text(
+                    text = "Selected: ${selectedCountry?.name ?: "None"}",
+                    color = MaterialTheme.styles.foreground,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        ContentPageWithTitle("5. Short list (adaptive height)") {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val shortList = remember { listOf("Yes", "No") }
+                var selected by remember { mutableStateOf<String?>(null) }
+
+                Select(
+                    options = shortList,
+                    selectedOption = selected,
+                    onOptionSelected = { selected = it },
+                    modifier = Modifier.width(280.dp),
+                    placeholder = "Select..."
+                )
+                Text(
+                    text = "Selected: ${selected ?: "None"}",
                     color = MaterialTheme.styles.foreground,
                     style = MaterialTheme.typography.bodyLarge
                 )

@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -68,7 +68,9 @@ enum class DateSelectionMode {
     FutureOrToday
 }
 
-// Helper data class to represent a YearMonth
+/**
+ * Helper data class to represent a year-month pair for calendar navigation.
+ */
 data class YearMonth(val year: Int, val month: Month) {
     fun atDay(day: Int): LocalDate {
         return LocalDate(year, month, day)
@@ -185,6 +187,19 @@ private fun Month.getShortName(): String {
 }
 
 /**
+ * Converts a [DayOfWeek] to a Sunday-start index (Sunday=0, Monday=1, ..., Saturday=6).
+ */
+private fun DayOfWeek.toSundayStartIndex(): Int = when (this) {
+    DayOfWeek.SUNDAY -> 0
+    DayOfWeek.MONDAY -> 1
+    DayOfWeek.TUESDAY -> 2
+    DayOfWeek.WEDNESDAY -> 3
+    DayOfWeek.THURSDAY -> 4
+    DayOfWeek.FRIDAY -> 5
+    DayOfWeek.SATURDAY -> 6
+}
+
+/**
  * A Jetpack Compose Calendar component inspired by Shadcn UI.
  * Allows single date selection and month/year navigation via dropdowns.
  *
@@ -208,7 +223,9 @@ fun Calendar(
     val themeColors = MaterialTheme.styles
     val radius = MaterialTheme.radius
     var currentMonth by remember { mutableStateOf(initialMonth) }
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val today = remember {
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
 
     var showMonthPicker by remember { mutableStateOf(false) }
     var showYearPicker by remember { mutableStateOf(false) }
@@ -226,9 +243,17 @@ fun Calendar(
         ).map { it.getShortName() }
     }
 
+    // Pre-compute text styles used in the day grid
+    val dayTextStyleNormal = remember {
+        TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)
+    }
+    val dayTextStyleBold = remember {
+        TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+    }
+
     Box(
         modifier = modifier
-            .width(300.dp)
+            .widthIn(max = 300.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -337,19 +362,10 @@ fun Calendar(
 
             // --- Days Grid ---
             val firstDayOfMonth = currentMonth.atDay(1)
-            val firstDayOfWeekValue = firstDayOfMonth.dayOfWeek
             val daysInMonth = currentMonth.lengthOfMonth()
 
-            // Calculate leading empty days (Sunday = 0)
-            val leadingEmptyDays = when (firstDayOfWeekValue) {
-                DayOfWeek.SUNDAY -> 0
-                DayOfWeek.MONDAY -> 1
-                DayOfWeek.TUESDAY -> 2
-                DayOfWeek.WEDNESDAY -> 3
-                DayOfWeek.THURSDAY -> 4
-                DayOfWeek.FRIDAY -> 5
-                DayOfWeek.SATURDAY -> 6
-            }
+            // Calculate leading empty days using Sunday-start index
+            val leadingEmptyDays = firstDayOfMonth.dayOfWeek.toSundayStartIndex()
 
             // Get previous month info for leading dates
             val previousMonth = currentMonth.minusMonths(1)
@@ -359,6 +375,9 @@ fun Calendar(
             val totalActiveDays = leadingEmptyDays + daysInMonth
             val totalCells = ((totalActiveDays + 6) / 7) * 7
             val numRows = totalCells / 7
+
+            val cellBgStyle = colors.dateCellBgStyle
+            val cellTextStyle = colors.dateCellTextStyle
 
             Column {
                 for (row in 0 until numRows) {
@@ -395,50 +414,50 @@ fun Calendar(
                                 DateSelectionMode.FutureOrToday -> date >= today
                             }
 
-                            val interactionSource = remember { MutableInteractionSource() }
+                            val interactionSource = remember(date) { MutableInteractionSource() }
                             val isPressed = interactionSource.collectIsPressedAsState().value
-                            val cellBgStyle = colors.dateCellBgStyle
-                            val cellTextStyle = colors.dateCellTextStyle
-                            val backgroundColor: Color = animateColorAsState(
-                                targetValue = when {
+
+                            // Only animate for press state; use direct values for other states
+                            val backgroundColor = if (isPressed && isClickable) {
+                                animateColorAsState(
+                                    targetValue = cellBgStyle.onPressed,
+                                    animationSpec = tween(durationMillis = 100),
+                                    label = "dayPressBackground"
+                                ).value
+                            } else {
+                                when {
                                     isSelected -> cellBgStyle.selectedDate
-                                    isClickable && isPressed -> cellBgStyle.onPressed
                                     isToday && isCurrentMonth -> cellBgStyle.todayUnselectedBg
                                     else -> cellBgStyle.defaultDateCell
-                                },
-                                animationSpec = tween(durationMillis = 100), label = "dayBackground"
-                            ).value
+                                }
+                            }
 
-                            val textColor = animateColorAsState(
-                                targetValue = when {
-                                    isSelected -> cellTextStyle.selectedDate
-                                    isToday && isCurrentMonth -> cellTextStyle.todayUnselected
-                                    isCurrentMonth && isClickable -> cellTextStyle.currentMonthUnselected
-                                    isCurrentMonth -> {
-                                        when (dateSelectionMode) {
-                                            DateSelectionMode.All -> cellTextStyle.currentMonthUnselected
-                                            DateSelectionMode.PastOrToday -> {
-                                                if (date <= today) {
-                                                    cellTextStyle.currentMonthUnselected
-                                                } else {
-                                                    cellTextStyle.currentMonthDisabled
-                                                }
-                                            }
-                                            DateSelectionMode.FutureOrToday -> {
-                                                if (date >= today) {
-                                                    cellTextStyle.currentMonthUnselected
-                                                } else {
-                                                    cellTextStyle.currentMonthDisabled
-                                                }
-                                            }
+                            val textColor = when {
+                                isSelected -> cellTextStyle.selectedDate
+                                isToday && isCurrentMonth -> cellTextStyle.todayUnselected
+                                isCurrentMonth && isClickable -> cellTextStyle.currentMonthUnselected
+                                isCurrentMonth -> {
+                                    when (dateSelectionMode) {
+                                        DateSelectionMode.All -> cellTextStyle.currentMonthUnselected
+                                        DateSelectionMode.PastOrToday -> {
+                                            if (date <= today) cellTextStyle.currentMonthUnselected
+                                            else cellTextStyle.currentMonthDisabled
+                                        }
+                                        DateSelectionMode.FutureOrToday -> {
+                                            if (date >= today) cellTextStyle.currentMonthUnselected
+                                            else cellTextStyle.currentMonthDisabled
                                         }
                                     }
-                                    // Previous/next month dates - more muted
-                                    isClickable -> cellTextStyle.previousAndNextDateMonth
-                                    else -> cellTextStyle.previousAndNextDateMonthDisabled
-                                },
-                                animationSpec = tween(durationMillis = 100), label = "dayText"
-                            ).value
+                                }
+                                isClickable -> cellTextStyle.previousAndNextDateMonth
+                                else -> cellTextStyle.previousAndNextDateMonthDisabled
+                            }
+
+                            val textStyle = if (isSelected || (isToday && isCurrentMonth)) {
+                                dayTextStyleBold
+                            } else {
+                                dayTextStyleNormal
+                            }
 
                             Box(
                                 modifier = Modifier
@@ -452,7 +471,7 @@ fun Calendar(
                                         indication = null
                                     ) {
                                         onDateSelected(date)
-                                        // Optional: Navigate to the selected date's month if it's not current month
+                                        // Navigate to the selected date's month if it's not current month
                                         if (!isCurrentMonth) {
                                             currentMonth = YearMonth.from(date)
                                         }
@@ -461,16 +480,8 @@ fun Calendar(
                             ) {
                                 Text(
                                     text = date.day.toString(),
-                                    style = TextStyle(
-                                        color = textColor,
-                                        fontSize = 14.sp,
-                                        fontWeight = when {
-                                            isSelected -> FontWeight.SemiBold
-                                            isToday && isCurrentMonth -> FontWeight.SemiBold
-                                            isCurrentMonth -> FontWeight.Normal
-                                            else -> FontWeight.Normal
-                                        }
-                                    )
+                                    style = textStyle,
+                                    color = textColor
                                 )
                             }
                         }
@@ -536,12 +547,9 @@ private fun MonthPickerDialog(
             LaunchedEffect(Unit) {
                 val initialIndex = months.indexOf(currentMonth)
                 if (initialIndex != -1) {
-                    // Calculate the offset to center the item in the viewport
-                    // Assuming each item is roughly 44.dp tall (py-2 + text height)
                     val itemHeightPx = with(density) { 44.dp.toPx() }
                     val containerHeightPx = with(density) { 300.dp.toPx() }
                     val offsetToCenter = (itemHeightPx / 2f) - (containerHeightPx / 2f)
-
                     listState.scrollToItem(initialIndex, offsetToCenter.roundToInt())
                 }
             }
@@ -553,14 +561,8 @@ private fun MonthPickerDialog(
             ) {
                 items(months) { month ->
                     val isSelected = month == currentMonth
-                    val backgroundColor = animateColorAsState(
-                        targetValue = if (isSelected) colors.selectedBg else colors.unselectedBg,
-                        animationSpec = tween(durationMillis = 100), label = "monthBackground"
-                    ).value
-                    val textColor = animateColorAsState(
-                        targetValue = if (isSelected) colors.selectedText else colors.unselectedText,
-                        animationSpec = tween(durationMillis = 100), label = "monthText"
-                    ).value
+                    val backgroundColor = if (isSelected) colors.selectedBg else colors.unselectedBg
+                    val textColor = if (isSelected) colors.selectedText else colors.unselectedText
 
                     Box(
                         modifier = Modifier
@@ -609,21 +611,20 @@ private fun YearPickerDialog(
                 .padding(8.dp)
                 .height(300.dp)
         ) {
-            val currentYearFromClock = Clock.System.now()
-                .toLocalDateTime(TimeZone.currentSystemDefault()).date.year
-            val years = remember { (1970..currentYearFromClock + 5).toList() }
+            val years = remember {
+                val now = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault()).date.year
+                (1970..now + 5).toList()
+            }
             val listState = rememberLazyListState()
 
             // Scroll to current year on initial composition
             LaunchedEffect(Unit) {
                 val initialIndex = years.indexOf(currentYear)
                 if (initialIndex != -1) {
-                    // Calculate the offset to center the item in the viewport
-                    // Assuming each item is roughly 44.dp tall (py-2 + text height)
                     val itemHeightPx = with(density) { 44.dp.toPx() }
                     val containerHeightPx = with(density) { 300.dp.toPx() }
                     val offsetToCenter = (itemHeightPx / 2f) - (containerHeightPx / 2f)
-
                     listState.scrollToItem(initialIndex, offsetToCenter.roundToInt())
                 }
             }
@@ -635,14 +636,8 @@ private fun YearPickerDialog(
             ) {
                 items(years) { year ->
                     val isSelected = year == currentYear
-                    val backgroundColor = animateColorAsState(
-                        targetValue = if (isSelected) colors.selectedBg else colors.unselectedBg,
-                        animationSpec = tween(durationMillis = 100), label = "yearBackground"
-                    ).value
-                    val textColor = animateColorAsState(
-                        targetValue = if (isSelected) colors.selectedText else colors.unselectedText,
-                        animationSpec = tween(durationMillis = 100), label = "yearText"
-                    ).value
+                    val backgroundColor = if (isSelected) colors.selectedBg else colors.unselectedBg
+                    val textColor = if (isSelected) colors.selectedText else colors.unselectedText
 
                     Box(
                         modifier = Modifier
@@ -744,43 +739,11 @@ object CalendarDefaults {
 
     @Composable
     fun colors(): CalendarStyle {
-        val styles = MaterialTheme.styles
-        return CalendarStyle(
-            background = styles.background,
-            border = styles.border,
-            leftIconTint = styles.foreground,
-            rightIconTint = styles.foreground,
-            monthText = Color.Unspecified,
-            yearText = Color.Unspecified,
-            monthSelectorBorder = styles.border,
-            yearSelectorBorder = styles.border,
-            weekDaysText = styles.mutedForeground,
-            dateCellBgStyle = DateCellBackgroundStyle(
-                selectedDate = styles.primary,
-                todayUnselectedBg = styles.muted,
-                onPressed = styles.accent,
-                defaultDateCell = Color.Transparent
-            ),
-            dateCellTextStyle = DateCellTextStyle(
-                selectedDate = styles.primaryForeground,
-                todayUnselected = styles.accentForeground,
-                currentMonthUnselected = styles.foreground,
-                currentMonthDisabled = styles.mutedForeground.copy(alpha = 0.4f),
-                previousAndNextDateMonth = styles.mutedForeground,
-                previousAndNextDateMonthDisabled = styles.mutedForeground.copy(alpha = 0.3f)
-            ),
-            dialogStyle = SelectorDialogStyle(
-                selectedBg = styles.primary,
-                selectedText = styles.primaryForeground,
-                unselectedBg = Color.Transparent,
-                unselectedText = styles.popoverForeground,
-            )
-        )
+        return colorsFrom(MaterialTheme.styles)
     }
 
     @Composable
     fun colors(overrides: CalendarStyle.() -> CalendarStyle): CalendarStyle {
-        val styles = MaterialTheme.styles
-        return colorsFrom(styles).overrides()
+        return colorsFrom(MaterialTheme.styles).overrides()
     }
 }
