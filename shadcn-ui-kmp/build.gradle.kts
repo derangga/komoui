@@ -120,7 +120,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.derangga",
         artifactId = "shadcn-ui-kmp",
-        version = "0.2.0"
+        version = "0.2.1"
     )
 
     // Configure POM metadata for the published artifact
