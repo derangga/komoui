@@ -22,6 +22,7 @@ import dr.shadcn.kmp.pages.components.CardPage
 import dr.shadcn.kmp.pages.components.CardPlaygroundPage
 import dr.shadcn.kmp.pages.components.CarouselPage
 import dr.shadcn.kmp.pages.components.CheckboxPage
+import dr.shadcn.kmp.pages.components.CollapsiblePage
 import dr.shadcn.kmp.pages.components.ComboBoxPage
 import dr.shadcn.kmp.pages.components.DatePickerPage
 import dr.shadcn.kmp.pages.components.DropDownPage
@@ -87,6 +88,9 @@ fun ComponentNavigation(
         }
         composable(MainRoute.Checkbox.path) {
             CheckboxPage()
+        }
+        composable(MainRoute.Collapsible.path) {
+            CollapsiblePage()
         }
         composable(MainRoute.ComboBox.path) {
             ComboBoxPage()

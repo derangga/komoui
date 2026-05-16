@@ -25,6 +25,7 @@ sealed class MainRoute(val path: String) {
     data object Card : MainRoute("card")
     data object CardPlayground : MainRoute("card-playground")
     data object Carousel : MainRoute("carousel")
+    data object Collapsible : MainRoute("collapsible")
     data object Chart : MainRoute("chart")
     data object Checkbox : MainRoute("checkbox")
     data object ComboBox : MainRoute("combobox")

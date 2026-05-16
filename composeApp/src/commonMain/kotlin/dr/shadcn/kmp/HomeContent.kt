@@ -15,6 +15,7 @@ object HomeContent {
         Content("Calendar", MainRoute.Calendar.path),
         Content("Card", MainRoute.Card.path),
         Content("Carousel", MainRoute.Carousel.path),
+        Content("Collapsible", MainRoute.Collapsible.path),
         Content("Checkbox", MainRoute.Checkbox.path),
         Content("Combobox", MainRoute.ComboBox.path),
         Content("Date Picker", MainRoute.DatePicker.path),
