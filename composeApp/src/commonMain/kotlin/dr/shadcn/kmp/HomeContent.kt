@@ -18,6 +18,7 @@ object HomeContent {
         Content("Collapsible", MainRoute.Collapsible.path),
         Content("Checkbox", MainRoute.Checkbox.path),
         Content("Combobox", MainRoute.ComboBox.path),
+        Content("Data Table", MainRoute.DataTable.path),
         Content("Date Picker", MainRoute.DatePicker.path),
         Content("Dropdown", MainRoute.DropDown.path),
         Content("Input", MainRoute.Input.path),

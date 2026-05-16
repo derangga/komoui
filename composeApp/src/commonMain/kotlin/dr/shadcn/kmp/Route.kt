@@ -29,6 +29,7 @@ sealed class MainRoute(val path: String) {
     data object Chart : MainRoute("chart")
     data object Checkbox : MainRoute("checkbox")
     data object ComboBox : MainRoute("combobox")
+    data object DataTable : MainRoute("data-table")
     data object DatePicker : MainRoute("date-picker")
     data object DropDown : MainRoute("dropdown")
     data object Input : MainRoute("input")
