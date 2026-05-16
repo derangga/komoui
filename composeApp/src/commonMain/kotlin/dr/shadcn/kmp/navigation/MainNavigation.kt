@@ -22,9 +22,12 @@ import dr.shadcn.kmp.pages.components.CardPage
 import dr.shadcn.kmp.pages.components.CardPlaygroundPage
 import dr.shadcn.kmp.pages.components.CarouselPage
 import dr.shadcn.kmp.pages.components.CheckboxPage
+import dr.shadcn.kmp.pages.components.CollapsiblePage
 import dr.shadcn.kmp.pages.components.ComboBoxPage
+import dr.shadcn.kmp.pages.components.DataTablePage
 import dr.shadcn.kmp.pages.components.DatePickerPage
 import dr.shadcn.kmp.pages.components.DropDownPage
+import dr.shadcn.kmp.pages.components.InputOTPPage
 import dr.shadcn.kmp.pages.components.InputPage
 import dr.shadcn.kmp.pages.components.PopoverPage
 import dr.shadcn.kmp.pages.components.ProgressPage
@@ -32,6 +35,7 @@ import dr.shadcn.kmp.pages.components.RadioButtonPage
 import dr.shadcn.kmp.pages.components.SelectPage
 import dr.shadcn.kmp.pages.components.SidebarCollectionPage
 import dr.shadcn.kmp.pages.components.SkeletonPage
+import dr.shadcn.kmp.pages.components.SpinnerPage
 import dr.shadcn.kmp.pages.components.SliderPage
 import dr.shadcn.kmp.pages.components.SonnerPage
 import dr.shadcn.kmp.pages.components.SwitchPage
@@ -88,8 +92,14 @@ fun ComponentNavigation(
         composable(MainRoute.Checkbox.path) {
             CheckboxPage()
         }
+        composable(MainRoute.Collapsible.path) {
+            CollapsiblePage()
+        }
         composable(MainRoute.ComboBox.path) {
             ComboBoxPage()
+        }
+        composable(MainRoute.DataTable.path) {
+            DataTablePage()
         }
         composable(MainRoute.DatePicker.path) {
             DatePickerPage()
@@ -99,6 +109,9 @@ fun ComponentNavigation(
         }
         composable(MainRoute.Input.path) {
             InputPage()
+        }
+        composable(MainRoute.InputOTP.path) {
+            InputOTPPage()
         }
         composable(MainRoute.Popover.path) {
             PopoverPage()
@@ -123,6 +136,9 @@ fun ComponentNavigation(
         }
         composable(MainRoute.Slider.path) {
             SliderPage()
+        }
+        composable(MainRoute.Spinner.path) {
+            SpinnerPage()
         }
         composable(MainRoute.Switch.path) {
             SwitchPage()
