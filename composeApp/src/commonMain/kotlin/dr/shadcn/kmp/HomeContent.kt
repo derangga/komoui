@@ -22,6 +22,7 @@ object HomeContent {
         Content("Date Picker", MainRoute.DatePicker.path),
         Content("Dropdown", MainRoute.DropDown.path),
         Content("Input", MainRoute.Input.path),
+        Content("Input OTP", MainRoute.InputOTP.path),
         Content("Popover", MainRoute.Popover.path),
         Content("Progress", MainRoute.Progress.path),
         Content("Radio Button", MainRoute.RadioButton.path),

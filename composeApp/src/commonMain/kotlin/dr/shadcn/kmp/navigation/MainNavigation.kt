@@ -27,6 +27,7 @@ import dr.shadcn.kmp.pages.components.ComboBoxPage
 import dr.shadcn.kmp.pages.components.DataTablePage
 import dr.shadcn.kmp.pages.components.DatePickerPage
 import dr.shadcn.kmp.pages.components.DropDownPage
+import dr.shadcn.kmp.pages.components.InputOTPPage
 import dr.shadcn.kmp.pages.components.InputPage
 import dr.shadcn.kmp.pages.components.PopoverPage
 import dr.shadcn.kmp.pages.components.ProgressPage
@@ -107,6 +108,9 @@ fun ComponentNavigation(
         }
         composable(MainRoute.Input.path) {
             InputPage()
+        }
+        composable(MainRoute.InputOTP.path) {
+            InputOTPPage()
         }
         composable(MainRoute.Popover.path) {
             PopoverPage()
