@@ -29,14 +29,14 @@ Add the library to your module's `build.gradle` file. You can find the latest ve
 **Groovy**
 ```gradle
 dependencies {
-    implementation 'io.github.derangga:shadcn-ui-kmp:0.2.0'
+    implementation 'io.github.derangga:shadcn-ui-kmp:latest'
 }
 ```
 
 **Kotlin DSL**
 ```kts
 dependencies {
-    implementation("io.github.derangga:shadcn-ui-kmp:0.2.0")
+    implementation("io.github.derangga:shadcn-ui-kmp:latest")
 }
 ```
 
@@ -157,21 +157,26 @@ Here's a list of currently available components:
 *   **Button**
 *   **Calendar**
 *   **Card**
+*   **Carousel**
 *   **Checkbox**
+*   **Collapsible**
 *   **Combobox**
 *   **DatePicker**
 *   **Dialog**
+*   **Drawer**
 *   **DropdownMenu**
 *   **Input** (TextField)
+*   **InputOTP**
 *   **Popover**
 *   **Progress**
-*   **RadioGroup**
+*   **RadioButton**
 *   **Select**
-*   **Bottom Sheet**
 *   **Sidebar**
 *   **Skeleton**
 *   **Slider**
-*   **Switch**
 *   **Sonner**
+*   **Spinner**
+*   **Switch**
+*   **Table**
 *   **Tabs**
 
