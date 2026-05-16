@@ -35,6 +35,7 @@ import dr.shadcn.kmp.pages.components.RadioButtonPage
 import dr.shadcn.kmp.pages.components.SelectPage
 import dr.shadcn.kmp.pages.components.SidebarCollectionPage
 import dr.shadcn.kmp.pages.components.SkeletonPage
+import dr.shadcn.kmp.pages.components.SpinnerPage
 import dr.shadcn.kmp.pages.components.SliderPage
 import dr.shadcn.kmp.pages.components.SonnerPage
 import dr.shadcn.kmp.pages.components.SwitchPage
@@ -135,6 +136,9 @@ fun ComponentNavigation(
         }
         composable(MainRoute.Slider.path) {
             SliderPage()
+        }
+        composable(MainRoute.Spinner.path) {
+            SpinnerPage()
         }
         composable(MainRoute.Switch.path) {
             SwitchPage()

@@ -18,6 +18,7 @@
 ```bash
 ./gradlew :shadcn-ui-kmp:publishToMavenLocal  # Publish to local Maven repo
 ```
+CI/CD publishes to Maven Central via GitHub Actions on version tag push (e.g., `0.2.2`).
 
 ## Documentation
 ```bash

@@ -31,6 +31,7 @@ object HomeContent {
         Content("Sonner", MainRoute.Sonner.path),
         Content("Skeleton", MainRoute.Skeleton.path),
         Content("Slider", MainRoute.Slider.path),
+        Content("Spinner", MainRoute.Spinner.path),
         Content("Switch", MainRoute.Switch.path),
         Content("Tabs", MainRoute.Tabs.path),
     )

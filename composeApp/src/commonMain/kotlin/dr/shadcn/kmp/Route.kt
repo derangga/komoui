@@ -42,6 +42,7 @@ sealed class MainRoute(val path: String) {
     data object Sonner : MainRoute("sonner")
     data object Skeleton : MainRoute("skeleton")
     data object Slider : MainRoute("slider")
+    data object Spinner : MainRoute("spinner")
     data object Switch : MainRoute("switch")
     data object Tabs : MainRoute("tabs")
     data object Themes : MainRoute("themes-selection")
