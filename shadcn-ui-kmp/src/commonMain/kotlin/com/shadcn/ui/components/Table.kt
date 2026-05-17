@@ -257,9 +257,64 @@ data class DataTableColumn<T>(
 )
 
 /**
+ * Scope receiver for the [DataTable] `pagination` slot. Exposes the current pagination
+ * state and navigation actions so callers can render a custom pagination UI.
+ */
+interface PaginationScope {
+    /** Current page index (0-based). */
+    val page: Int
+
+    /** Total number of pages. Always at least 1. */
+    val pageCount: Int
+
+    /** True when [prev] will advance the page backward. */
+    val canPrev: Boolean
+
+    /** True when [next] will advance the page forward. */
+    val canNext: Boolean
+
+    /** Go to the previous page if [canPrev]. */
+    fun prev()
+
+    /** Go to the next page if [canNext]. */
+    fun next()
+
+    /** Jump to an absolute 0-based page index (coerced into range). */
+    fun goTo(page: Int)
+}
+
+/**
+ * Default pagination control rendered when no `pagination` slot is supplied. Renders a
+ * full-width row containing Previous/Next outline buttons aligned to the end. The "Page X of Y"
+ * indicator is rendered separately by [DataTable] in the summary row above.
+ */
+@Composable
+fun PaginationScope.DefaultPagination() {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Button(
+            onClick = ::prev,
+            variant = ButtonVariant.Outline,
+            size = ButtonSize.Sm,
+            enabled = canPrev
+        ) {
+            Text("Previous")
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(
+            onClick = ::next,
+            variant = ButtonVariant.Outline,
+            size = ButtonSize.Sm,
+            enabled = canNext
+        ) {
+            Text("Next")
+        }
+    }
+}
+
+/**
  * A typed Data Table inspired by shadcn's data-table demo. Provides sorting, optional row
- * selection, and Previous/Next pagination. Sorting and selection state are managed internally
- * unless [sortState] / [selectedItems] are provided (controlled mode).
+ * selection, and Previous/Next pagination. State is owned by the component; pass [onSortChange]
+ * and [onSelectionChange] to observe.
  *
  * The table scrolls horizontally — declare per-column [DataTableColumn.width] in [Dp] and the
  * row width is the sum of those plus the optional selection column.
@@ -270,19 +325,25 @@ data class DataTableColumn<T>(
  *
  * @param items Full unsorted, unpaginated data set.
  * @param columns Column definitions.
- * @param rowKey Stable key for an item. Used for selection lookups.
+ * @param rowKey Stable key for an item. Used for selection identity.
  * @param modifier Modifier applied to the outer container.
  * @param enableSelection When true a leading checkbox column is auto-prepended.
  * @param selectionColumnWidth Width of the auto-injected selection column.
  * @param pageSize Rows per page.
- * @param initialSort Initial sort state (uncontrolled).
- * @param sortState External sort state (controlled). When non-null overrides internal state.
- * @param onSortChange Sort change callback. Always invoked when sort changes.
- * @param selectedItems External selection (controlled). When non-null overrides internal state.
- *      Items are compared by [rowKey] — two items with the same key are treated as the same row.
- * @param onSelectionChange Selection change callback, emitted as a typed [Set] of selected items.
+ * @param initialSort Initial sort state.
+ * @param onSortChange Observer callback fired when sort changes.
+ * @param onSelectionChange Observer callback fired when selection changes. Items are compared
+ *      by [rowKey] — two items with the same key are treated as the same row.
  * @param onRowClick Optional row click handler.
  * @param caption Optional caption text rendered below the table.
+ * The footer below the table is laid out as two rows: a summary row showing "N of M
+ * row(s) selected." on the left and "Page X of Y" on the right, followed by the
+ * [pagination] slot which spans the full width below.
+ *
+ * @param pagination Slot rendered as a full-width row below the summary line. Defaults to
+ *      [DefaultPagination] (end-aligned Previous/Next buttons). The slot receives a
+ *      [PaginationScope] exposing page state and navigation actions, so callers can fully
+ *      replace the pagination UI (e.g. numbered pages, jump-to controls).
  */
 @Composable
 fun <T> DataTable(
@@ -294,55 +355,68 @@ fun <T> DataTable(
     selectionColumnWidth: Dp = 48.dp,
     pageSize: Int = 10,
     initialSort: SortState = SortState(),
-    sortState: SortState? = null,
     onSortChange: ((SortState) -> Unit)? = null,
-    selectedItems: Set<T>? = null,
     onSelectionChange: ((Set<T>) -> Unit)? = null,
     onRowClick: ((T) -> Unit)? = null,
-    caption: String? = null
+    caption: String? = null,
+    pagination: @Composable PaginationScope.() -> Unit = { DefaultPagination() }
 ) {
     val styles = MaterialTheme.styles
 
-    var internalSort by remember { mutableStateOf(initialSort) }
-    val effectiveSort = sortState ?: internalSort
+    var sort by remember { mutableStateOf(initialSort) }
     val updateSort: (SortState) -> Unit = { next ->
-        if (sortState == null) {
-            internalSort = next
-        }
+        sort = next
         onSortChange?.invoke(next)
     }
 
-    var internalSelection by remember { mutableStateOf<Set<T>>(emptySet()) }
-    val effectiveSelection: Set<T> = selectedItems ?: internalSelection
+    var selection by remember { mutableStateOf<Set<T>>(emptySet()) }
     val updateSelection: (Set<T>) -> Unit = { next ->
-        if (selectedItems == null) {
-            internalSelection = next
-        }
+        selection = next
         onSelectionChange?.invoke(next)
     }
-    val selectedKeySet: Set<Any> = remember(effectiveSelection) {
-        effectiveSelection.mapTo(mutableSetOf(), rowKey)
+    val selectedKeySet: Set<Any> = remember(selection) {
+        selection.mapTo(mutableSetOf(), rowKey)
     }
 
-    val sorted = remember(items, effectiveSort, columns) {
-        val col = columns.firstOrNull { it.id == effectiveSort.columnId }
+    val sorted = remember(items, sort, columns) {
+        val col = columns.firstOrNull { it.id == sort.columnId }
         val cmp = col?.comparator
         when {
-            cmp == null || effectiveSort.direction == SortDirection.NONE -> items
-            effectiveSort.direction == SortDirection.ASC -> items.sortedWith(cmp)
+            cmp == null || sort.direction == SortDirection.NONE -> items
+            sort.direction == SortDirection.ASC -> items.sortedWith(cmp)
             else -> items.sortedWith(cmp.reversed())
         }
     }
 
-    val pageCount = if (sorted.isEmpty()) 1 else (sorted.size + pageSize - 1) / pageSize
-    var page by remember { mutableStateOf(0) }
-    LaunchedEffect(pageCount) {
-        if (page >= pageCount) page = pageCount - 1
-        if (page < 0) page = 0
+    val totalPages = if (sorted.isEmpty()) 1 else (sorted.size + pageSize - 1) / pageSize
+    val pageState = remember { mutableStateOf(0) }
+    val currentPage = pageState.value.coerceIn(0, totalPages - 1)
+    LaunchedEffect(totalPages) {
+        pageState.value = pageState.value.coerceIn(0, totalPages - 1)
     }
-    val pageItems = sorted.drop(page * pageSize).take(pageSize)
+    val pageItems = sorted.drop(currentPage * pageSize).take(pageSize)
     val pageKeys = pageItems.map(rowKey).toSet()
     val allOnPageSelected = pageKeys.isNotEmpty() && selectedKeySet.containsAll(pageKeys)
+
+    val paginationScope = remember(totalPages) {
+        object : PaginationScope {
+            override val page: Int get() = pageState.value
+            override val pageCount: Int get() = totalPages
+            override val canPrev: Boolean get() = pageState.value > 0
+            override val canNext: Boolean get() = pageState.value < totalPages - 1
+            override fun prev() {
+                if (canPrev) pageState.value--
+            }
+
+            override fun next() {
+                if (canNext) pageState.value++
+            }
+
+            override fun goTo(page: Int) {
+                pageState.value = page.coerceIn(0, totalPages - 1)
+            }
+        }
+    }
 
     val totalWidth = columns.fold(0.dp) { acc, c -> acc + c.width } +
             (if (enableSelection) selectionColumnWidth else 0.dp)
@@ -359,7 +433,7 @@ fun <T> DataTable(
                             Checkbox(
                                 checked = allOnPageSelected,
                                 onCheckedChange = { checked ->
-                                    val next = effectiveSelection.toMutableSet()
+                                    val next = selection.toMutableSet()
                                     if (checked) {
                                         next.addAll(pageItems)
                                     } else {
@@ -379,10 +453,10 @@ fun <T> DataTable(
                         ) {
                             SortableHeader(
                                 column = col,
-                                sort = effectiveSort,
+                                sort = sort,
                                 onClick = {
                                     if (col.sortable && col.comparator != null) {
-                                        updateSort(nextSort(effectiveSort, col.id))
+                                        updateSort(nextSort(sort, col.id))
                                     }
                                 }
                             )
@@ -426,7 +500,7 @@ fun <T> DataTable(
                                     Checkbox(
                                         checked = isSelected,
                                         onCheckedChange = { checked ->
-                                            val next = effectiveSelection.toMutableSet()
+                                            val next = selection.toMutableSet()
                                             if (checked) {
                                                 next.add(item)
                                             } else {
@@ -457,45 +531,25 @@ fun <T> DataTable(
             TableCaption(text = caption)
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (enableSelection) {
-                    Text(
-                        text = "${effectiveSelection.size} of ${sorted.size} row(s) selected.",
-                        color = styles.mutedForeground,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (enableSelection) {
                 Text(
-                    text = "Page ${page + 1} of $pageCount",
+                    text = "${selection.size} of ${sorted.size} row(s) selected.",
                     color = styles.mutedForeground,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = { if (page > 0) page-- },
-                    variant = ButtonVariant.Outline,
-                    size = ButtonSize.Sm,
-                    enabled = page > 0
-                ) {
-                    Text("Previous")
-                }
-                Button(
-                    onClick = { if (page < pageCount - 1) page++ },
-                    variant = ButtonVariant.Outline,
-                    size = ButtonSize.Sm,
-                    enabled = page < pageCount - 1
-                ) {
-                    Text("Next")
-                }
-            }
+            Text(
+                text = "Page ${paginationScope.page + 1} of ${paginationScope.pageCount}",
+                color = styles.mutedForeground,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
+        with(paginationScope) { pagination() }
     }
 }
 

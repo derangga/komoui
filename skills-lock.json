@@ -5,6 +5,12 @@
       "source": "thebushidocollective/han",
       "sourceType": "github",
       "computedHash": "7c17e8d8ecfc7159fa18a4359cc0e53868134b6bfd28e825b5c5473d52987853"
+    },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "784f0dbb7403b0f00324bce9a112f715342777a0daee7bbb7385f9c6f0a170ea"
     }
   }
 }

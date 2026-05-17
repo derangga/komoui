@@ -144,7 +144,7 @@ private fun PaymentDataTableDemo() {
     DataTable(
         items = samplePayments,
         columns = columns,
-        rowKey = { it },
+        rowKey = { it.id },
         modifier = Modifier.fillMaxWidth(),
         enableSelection = true,
         pageSize = 5,
