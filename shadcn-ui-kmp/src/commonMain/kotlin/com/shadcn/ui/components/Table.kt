@@ -258,8 +258,8 @@ data class DataTableColumn<T>(
 
 /**
  * A typed Data Table inspired by shadcn's data-table demo. Provides sorting, optional row
- * selection, and Previous/Next pagination. Sorting and selection state are managed internally
- * unless [sortState] / [selectedItems] are provided (controlled mode).
+ * selection, and Previous/Next pagination. State is owned by the component; pass [onSortChange]
+ * and [onSelectionChange] to observe.
  *
  * The table scrolls horizontally — declare per-column [DataTableColumn.width] in [Dp] and the
  * row width is the sum of those plus the optional selection column.
@@ -270,17 +270,15 @@ data class DataTableColumn<T>(
  *
  * @param items Full unsorted, unpaginated data set.
  * @param columns Column definitions.
- * @param rowKey Stable key for an item. Used for selection lookups.
+ * @param rowKey Stable key for an item. Used for selection identity.
  * @param modifier Modifier applied to the outer container.
  * @param enableSelection When true a leading checkbox column is auto-prepended.
  * @param selectionColumnWidth Width of the auto-injected selection column.
  * @param pageSize Rows per page.
- * @param initialSort Initial sort state (uncontrolled).
- * @param sortState External sort state (controlled). When non-null overrides internal state.
- * @param onSortChange Sort change callback. Always invoked when sort changes.
- * @param selectedItems External selection (controlled). When non-null overrides internal state.
- *      Items are compared by [rowKey] — two items with the same key are treated as the same row.
- * @param onSelectionChange Selection change callback, emitted as a typed [Set] of selected items.
+ * @param initialSort Initial sort state.
+ * @param onSortChange Observer callback fired when sort changes.
+ * @param onSelectionChange Observer callback fired when selection changes. Items are compared
+ *      by [rowKey] — two items with the same key are treated as the same row.
  * @param onRowClick Optional row click handler.
  * @param caption Optional caption text rendered below the table.
  */
@@ -294,42 +292,34 @@ fun <T> DataTable(
     selectionColumnWidth: Dp = 48.dp,
     pageSize: Int = 10,
     initialSort: SortState = SortState(),
-    sortState: SortState? = null,
     onSortChange: ((SortState) -> Unit)? = null,
-    selectedItems: Set<T>? = null,
     onSelectionChange: ((Set<T>) -> Unit)? = null,
     onRowClick: ((T) -> Unit)? = null,
     caption: String? = null
 ) {
     val styles = MaterialTheme.styles
 
-    var internalSort by remember { mutableStateOf(initialSort) }
-    val effectiveSort = sortState ?: internalSort
+    var sort by remember { mutableStateOf(initialSort) }
     val updateSort: (SortState) -> Unit = { next ->
-        if (sortState == null) {
-            internalSort = next
-        }
+        sort = next
         onSortChange?.invoke(next)
     }
 
-    var internalSelection by remember { mutableStateOf<Set<T>>(emptySet()) }
-    val effectiveSelection: Set<T> = selectedItems ?: internalSelection
+    var selection by remember { mutableStateOf<Set<T>>(emptySet()) }
     val updateSelection: (Set<T>) -> Unit = { next ->
-        if (selectedItems == null) {
-            internalSelection = next
-        }
+        selection = next
         onSelectionChange?.invoke(next)
     }
-    val selectedKeySet: Set<Any> = remember(effectiveSelection) {
-        effectiveSelection.mapTo(mutableSetOf(), rowKey)
+    val selectedKeySet: Set<Any> = remember(selection) {
+        selection.mapTo(mutableSetOf(), rowKey)
     }
 
-    val sorted = remember(items, effectiveSort, columns) {
-        val col = columns.firstOrNull { it.id == effectiveSort.columnId }
+    val sorted = remember(items, sort, columns) {
+        val col = columns.firstOrNull { it.id == sort.columnId }
         val cmp = col?.comparator
         when {
-            cmp == null || effectiveSort.direction == SortDirection.NONE -> items
-            effectiveSort.direction == SortDirection.ASC -> items.sortedWith(cmp)
+            cmp == null || sort.direction == SortDirection.NONE -> items
+            sort.direction == SortDirection.ASC -> items.sortedWith(cmp)
             else -> items.sortedWith(cmp.reversed())
         }
     }
@@ -359,7 +349,7 @@ fun <T> DataTable(
                             Checkbox(
                                 checked = allOnPageSelected,
                                 onCheckedChange = { checked ->
-                                    val next = effectiveSelection.toMutableSet()
+                                    val next = selection.toMutableSet()
                                     if (checked) {
                                         next.addAll(pageItems)
                                     } else {
@@ -379,10 +369,10 @@ fun <T> DataTable(
                         ) {
                             SortableHeader(
                                 column = col,
-                                sort = effectiveSort,
+                                sort = sort,
                                 onClick = {
                                     if (col.sortable && col.comparator != null) {
-                                        updateSort(nextSort(effectiveSort, col.id))
+                                        updateSort(nextSort(sort, col.id))
                                     }
                                 }
                             )
@@ -426,7 +416,7 @@ fun <T> DataTable(
                                     Checkbox(
                                         checked = isSelected,
                                         onCheckedChange = { checked ->
-                                            val next = effectiveSelection.toMutableSet()
+                                            val next = selection.toMutableSet()
                                             if (checked) {
                                                 next.add(item)
                                             } else {
@@ -465,7 +455,7 @@ fun <T> DataTable(
             ) {
                 if (enableSelection) {
                     Text(
-                        text = "${effectiveSelection.size} of ${sorted.size} row(s) selected.",
+                        text = "${selection.size} of ${sorted.size} row(s) selected.",
                         color = styles.mutedForeground,
                         style = MaterialTheme.typography.bodySmall
                     )
