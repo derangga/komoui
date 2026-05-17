@@ -32,6 +32,7 @@ sealed class MainRoute(val path: String) {
     data object DataTable : MainRoute("data-table")
     data object DatePicker : MainRoute("date-picker")
     data object DropDown : MainRoute("dropdown")
+    data object Empty : MainRoute("empty")
     data object Input : MainRoute("input")
     data object InputOTP : MainRoute("input-otp")
     data object Popover : MainRoute("popover")

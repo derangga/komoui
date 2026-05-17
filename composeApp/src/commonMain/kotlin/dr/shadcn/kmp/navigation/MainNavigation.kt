@@ -21,12 +21,14 @@ import dr.shadcn.kmp.pages.components.CalendarPage
 import dr.shadcn.kmp.pages.components.CardPage
 import dr.shadcn.kmp.pages.components.CardPlaygroundPage
 import dr.shadcn.kmp.pages.components.CarouselPage
+import dr.shadcn.kmp.pages.components.ChartPage
 import dr.shadcn.kmp.pages.components.CheckboxPage
 import dr.shadcn.kmp.pages.components.CollapsiblePage
 import dr.shadcn.kmp.pages.components.ComboBoxPage
 import dr.shadcn.kmp.pages.components.DataTablePage
 import dr.shadcn.kmp.pages.components.DatePickerPage
 import dr.shadcn.kmp.pages.components.DropDownPage
+import dr.shadcn.kmp.pages.components.EmptyPage
 import dr.shadcn.kmp.pages.components.InputOTPPage
 import dr.shadcn.kmp.pages.components.InputPage
 import dr.shadcn.kmp.pages.components.PopoverPage
@@ -89,6 +91,9 @@ fun ComponentNavigation(
         composable(MainRoute.Carousel.path) {
             CarouselPage()
         }
+        composable(MainRoute.Chart.path) {
+            ChartPage()
+        }
         composable(MainRoute.Checkbox.path) {
             CheckboxPage()
         }
@@ -106,6 +111,9 @@ fun ComponentNavigation(
         }
         composable(MainRoute.DropDown.path) {
             DropDownPage()
+        }
+        composable(MainRoute.Empty.path) {
+            EmptyPage()
         }
         composable(MainRoute.Input.path) {
             InputPage()
