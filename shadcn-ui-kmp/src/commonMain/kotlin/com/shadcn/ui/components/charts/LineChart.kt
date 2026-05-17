@@ -45,8 +45,11 @@ import kotlin.math.max
  *
  * When [scrollable] is true the plot area scrolls horizontally and each
  * x-category is given at least [minColumnWidth] of space. The y-axis labels
- * stay pinned on the left. Drag-scrub tooltips are disabled in this mode
- * because horizontal scroll claims the gesture.
+ * stay pinned on the left. Drag-scrub tooltips are force-disabled in this
+ * mode: `chartScrub` claims the gesture on pointer-down while
+ * `Modifier.horizontalScroll` claims after touch-slop, so they can't coexist
+ * without changing one strategy (see the `shadcn-charts` skill, Pitfall #4
+ * for the long-press / tap-only alternatives).
  *
  * Lines animate from left to right on first composition when [animate] is
  * true. When [showTooltip] is true (and [scrollable] is false), press-and-drag

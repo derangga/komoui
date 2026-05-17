@@ -216,6 +216,14 @@ internal fun rememberChartScrubState(): ChartScrubState = remember { ChartScrubS
 /**
  * Modifier that attaches tap-and-drag horizontal scrubbing. On press-down the
  * nearest column is selected; the selection follows the finger; release clears.
+ *
+ * This is **claim-on-down**: the first pointer-down is consumed immediately so
+ * the tooltip appears under the finger without a touch-slop delay. As a
+ * consequence it is **incompatible with `Modifier.horizontalScroll`**, which
+ * uses a claim-after-touch-slop strategy — once this modifier consumes the
+ * down event the scrollable parent never gets a chance to start scrolling.
+ * Chart composables resolve this by disabling tooltips when `scrollable = true`.
+ * See the `shadcn-charts` skill (Pitfall #4) for alternatives if you need both.
  */
 internal fun Modifier.chartScrub(
     columnCount: Int,
