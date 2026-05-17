@@ -348,6 +348,41 @@ internal fun DrawScope.drawAxesAndGrid(
 }
 
 /**
+ * Draws ONLY the y-axis tick labels into a dedicated, pinned canvas to the left
+ * of the plot. Used when [ChartScaffold] runs in scrollable mode so the y-axis
+ * stays in place while the plot scrolls horizontally.
+ *
+ * @param yAxisRect The drawable area of the y-axis canvas, excluding the
+ *   x-axis label strip at the bottom. Use [computePlotRect] with the y-axis
+ *   canvas size and the same bottom inset used by the plot.
+ */
+internal fun DrawScope.drawYAxisOnly(
+    yAxisRect: Rect,
+    yTicks: List<Float>,
+    domain: ClosedFloatingPointRange<Float>,
+    yLabelFormatter: (Float) -> String,
+    textMeasurer: TextMeasurer,
+    labelStyle: TextStyle,
+    labelColor: Color,
+) {
+    val span = domain.endInclusive - domain.start
+    if (span <= 0f) return
+    yTicks.forEach { tick ->
+        val y = yAxisRect.bottom - ((tick - domain.start) / span) * yAxisRect.height
+        val label = yLabelFormatter(tick)
+        val measured = textMeasurer.measure(label, labelStyle)
+        drawText(
+            textLayoutResult = measured,
+            color = labelColor,
+            topLeft = Offset(
+                x = yAxisRect.right - measured.size.width - 4f,
+                y = y - measured.size.height / 2f,
+            ),
+        )
+    }
+}
+
+/**
  * Draws a vertical indicator line at the scrub column.
  */
 internal fun DrawScope.drawScrubIndicator(

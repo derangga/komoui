@@ -148,7 +148,63 @@ fun ChartPage() {
             )
         }
 
-        ContentPageWithTitle("6. Area chart — multiple series") {
+        ContentPageWithTitle("6. Bar chart — scrollable (24 weeks)") {
+            val weeks = (1..24).map { "W$it" }
+            val visits = listOf(
+                120f, 145f, 132f, 168f, 192f, 174f, 205f, 188f,
+                221f, 240f, 215f, 198f, 230f, 262f, 248f, 271f,
+                290f, 275f, 302f, 318f, 295f, 311f, 340f, 358f,
+            )
+            BarChart(
+                modifier = Modifier.fillMaxWidth(),
+                series = listOf(
+                    BarSeries(
+                        key = "visits",
+                        label = "Visits",
+                        color = MaterialTheme.styles.chart2,
+                        points = weeks.zip(visits).map { (w, v) -> BarPoint(w, v) },
+                    ),
+                ),
+                chartHeight = 240.dp,
+                scrollable = true,
+            )
+        }
+
+        ContentPageWithTitle("7. Line chart — scrollable, multi-series (24 weeks)") {
+            val weeks = (1..24).map { "W$it" }
+            val a = listOf(
+                120f, 145f, 132f, 168f, 192f, 174f, 205f, 188f,
+                221f, 240f, 215f, 198f, 230f, 262f, 248f, 271f,
+                290f, 275f, 302f, 318f, 295f, 311f, 340f, 358f,
+            )
+            val b = listOf(
+                60f, 78f, 71f, 90f, 105f, 92f, 118f, 110f,
+                132f, 145f, 128f, 119f, 140f, 158f, 149f, 165f,
+                178f, 168f, 188f, 196f, 182f, 190f, 210f, 220f,
+            )
+            LineChart(
+                modifier = Modifier.fillMaxWidth(),
+                series = listOf(
+                    LineSeries(
+                        key = "desktop",
+                        label = "Desktop",
+                        color = MaterialTheme.styles.chart1,
+                        points = weeks.zip(a).map { (w, v) -> LinePoint(w, v) },
+                    ),
+                    LineSeries(
+                        key = "mobile",
+                        label = "Mobile",
+                        color = MaterialTheme.styles.chart2,
+                        points = weeks.zip(b).map { (w, v) -> LinePoint(w, v) },
+                    ),
+                ),
+                chartHeight = 240.dp,
+                scrollable = true,
+                showLegend = true,
+            )
+        }
+
+        ContentPageWithTitle("8. Area chart — multiple series") {
             AreaChart(
                 modifier = Modifier.fillMaxWidth(),
                 chartHeight = 240.dp,
