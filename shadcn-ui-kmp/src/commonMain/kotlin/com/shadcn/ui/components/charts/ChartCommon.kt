@@ -223,7 +223,7 @@ internal fun rememberChartScrubState(): ChartScrubState = remember { ChartScrubS
  * uses a claim-after-touch-slop strategy — once this modifier consumes the
  * down event the scrollable parent never gets a chance to start scrolling.
  * Chart composables resolve this by disabling tooltips when `scrollable = true`.
- * See the `shadcn-charts` skill (Pitfall #4) for alternatives if you need both.
+ * See `Chart.md` in this directory (Pitfall #4) for alternatives if you need both.
  */
 internal fun Modifier.chartScrub(
     columnCount: Int,
