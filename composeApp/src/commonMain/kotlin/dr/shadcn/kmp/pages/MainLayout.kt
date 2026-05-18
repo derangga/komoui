@@ -118,7 +118,7 @@ fun MainLayout(rootNav: NavHostController, viewModel: MainViewModel, isDark: Boo
     val filteredMenu by viewModel.searchResults.collectAsStateWithLifecycle()
     SidebarProvider(
         defaultOpen = true,
-        collapsible = SidebarCollapsible.Icon,
+        collapsible = SidebarCollapsible.Offcanvas,
     ) {
         Sidebar {
             SidebarHeader(

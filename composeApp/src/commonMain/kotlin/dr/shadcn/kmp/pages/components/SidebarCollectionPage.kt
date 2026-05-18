@@ -74,5 +74,27 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
                 onClick = { parentNav.navigate(TopLevelRoute.SidebarInsetGraph.path) }
             ) { Text("Open inset sidebar demo") }
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("3. Offcanvas sidebar (collapsible = Offcanvas)")
+        Accordion(
+            items =
+                listOf(
+                    AccordionItemData(
+                        id = "item-1",
+                        header = { Text("Details") },
+                        content = {
+                            Text("With collapsible = Offcanvas, the sidebar hides entirely when collapsed — no icon rail. The Sidebar slot emits nothing and the main content (SidebarInset) reclaims the full width. Tap SidebarTrigger to bring the sidebar back.")
+                        }
+                    )
+                )
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        ContentPageWithTitle {
+            Button(
+                onClick = { parentNav.navigate(TopLevelRoute.SidebarOffcanvasGraph.path) }
+            ) { Text("Open offcanvas sidebar demo") }
+        }
     }
 }

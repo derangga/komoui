@@ -1,6 +1,12 @@
 package com.shadcn.ui.components.sidebar
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -88,17 +94,41 @@ private fun SidebarShell(
         return
     }
 
-    if (state.collapsible == SidebarCollapsible.Offcanvas && !state.isOpen) {
-        // Offcanvas closed on desktop: emit nothing so the row reclaims the space.
-        return
-    }
-
     // Reset per-shell flags (rail) so this composition's `SidebarRail()` calls take effect.
     slots.railEnabled = false
 
-    when (state.variant) {
-        SidebarVariant.Sidebar, SidebarVariant.Inset -> DesktopStandardSidebar(modifier, content)
-        SidebarVariant.Floating -> DesktopFloatingSidebar(modifier, content)
+    val desktopShell: @Composable () -> Unit = {
+        when (state.variant) {
+            SidebarVariant.Sidebar, SidebarVariant.Inset -> DesktopStandardSidebar(modifier, content)
+            SidebarVariant.Floating -> DesktopFloatingSidebar(modifier, content)
+        }
+    }
+
+    // Offcanvas: wrap in AnimatedVisibility so the sidebar slides in/out and the row
+    // animates its measured width back to 0 (letting the inset expand smoothly).
+    // For Icon / None, the inner width animation handles the transition.
+    if (state.collapsible == SidebarCollapsible.Offcanvas) {
+        val fromStart = state.side == SidebarSide.Left
+        val durationMs = 220
+        AnimatedVisibility(
+            visible = state.isOpen,
+            enter = slideInHorizontally(animationSpec = tween(durationMs)) {
+                if (fromStart) -it else it
+            } + expandHorizontally(
+                animationSpec = tween(durationMs),
+                expandFrom = if (fromStart) Alignment.Start else Alignment.End,
+            ),
+            exit = slideOutHorizontally(animationSpec = tween(durationMs)) {
+                if (fromStart) -it else it
+            } + shrinkHorizontally(
+                animationSpec = tween(durationMs),
+                shrinkTowards = if (fromStart) Alignment.Start else Alignment.End,
+            ),
+        ) {
+            desktopShell()
+        }
+    } else {
+        desktopShell()
     }
 }
 

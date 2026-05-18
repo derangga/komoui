@@ -163,9 +163,9 @@ fun SidebarMenuButton(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (icon != null) {
-                    Box(modifier = Modifier.size(metrics.iconSize)) { icon() }
-                }
+                // Don't constrain the icon slot — user content (Avatar, custom icon, etc.) sets its own size.
+                // Suggested default for Material `Icon` callers: `modifier = Modifier.size(metrics.iconSize)`.
+                if (icon != null) icon()
                 content()
             }
         }

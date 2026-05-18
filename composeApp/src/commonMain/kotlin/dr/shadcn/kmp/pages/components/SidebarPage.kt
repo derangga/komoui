@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.shadcn.ui.components.Avatar
 import com.shadcn.ui.components.Button
 import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.sidebar.Sidebar
@@ -45,6 +47,7 @@ import com.shadcn.ui.components.sidebar.SidebarInset
 import com.shadcn.ui.components.sidebar.SidebarMenu
 import com.shadcn.ui.components.sidebar.SidebarMenuBadge
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
+import com.shadcn.ui.components.sidebar.SidebarMenuButtonSize
 import com.shadcn.ui.components.sidebar.SidebarMenuItem
 import com.shadcn.ui.components.sidebar.SidebarMenuSub
 import com.shadcn.ui.components.sidebar.SidebarMenuSubButton
@@ -85,7 +88,9 @@ fun SidebarLayoutPage() {
             SidebarContent {
                 AppSidebarMenu(sidebarNav, selectedItem) { selectedItem = it }
             }
-            SidebarFooter(text = "© 2025 Shadcn Compose")
+            SidebarFooter {
+                NavUser(name = "shadcn", email = "m@example.com")
+            }
         }
         SidebarInset {
             Column(
@@ -220,6 +225,55 @@ private fun AppSidebarMenu(
                             tint = MaterialTheme.styles.sidebarForeground,
                         )
                     },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * NavUser footer — mirrors shadcn's `NavUser` from dashboard-01/app-sidebar.tsx.
+ *
+ * Renders an avatar + name/email + chevron inside a Large [SidebarMenuButton]. Since
+ * the menu button collapses to icon-only in icon mode, the footer naturally reduces to
+ * just the avatar when the sidebar is collapsed.
+ */
+@Composable
+private fun NavUser(name: String, email: String) {
+    SidebarMenu {
+        SidebarMenuItem {
+            SidebarMenuButton(
+                onClick = { },
+                size = SidebarMenuButtonSize.Large,
+                tooltip = name,
+                icon = {
+                    Avatar(
+                        model = "https://avatars.githubusercontent.com/u/124599?v=4",
+                        size = 32.dp,
+                        fallbackText = name.take(2).uppercase(),
+                    )
+                },
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = name,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.styles.sidebarForeground,
+                        maxLines = 1,
+                    )
+                    Text(
+                        text = email,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.styles.mutedForeground,
+                        maxLines = 1,
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.UnfoldMore,
+                    contentDescription = "Open user menu",
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.styles.sidebarForeground,
                 )
             }
         }
