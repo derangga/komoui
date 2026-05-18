@@ -11,11 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.shadcn.ui.components.Avatar
+import com.shadcn.ui.components.Button
+import com.shadcn.ui.components.ButtonSize
+import com.shadcn.ui.components.sidebar.Sidebar
 import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
 import com.shadcn.ui.components.sidebar.SidebarFooter
@@ -38,66 +43,133 @@ import com.shadcn.ui.components.sidebar.SidebarGroup
 import com.shadcn.ui.components.sidebar.SidebarGroupContent
 import com.shadcn.ui.components.sidebar.SidebarGroupLabel
 import com.shadcn.ui.components.sidebar.SidebarHeader
-import com.shadcn.ui.components.sidebar.SidebarLayout
+import com.shadcn.ui.components.sidebar.SidebarInset
 import com.shadcn.ui.components.sidebar.SidebarMenu
 import com.shadcn.ui.components.sidebar.SidebarMenuBadge
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
+import com.shadcn.ui.components.sidebar.SidebarMenuButtonSize
+import com.shadcn.ui.components.sidebar.SidebarMenuItem
 import com.shadcn.ui.components.sidebar.SidebarMenuSub
 import com.shadcn.ui.components.sidebar.SidebarMenuSubButton
 import com.shadcn.ui.components.sidebar.SidebarProvider
+import com.shadcn.ui.components.sidebar.SidebarRail
 import com.shadcn.ui.components.sidebar.SidebarSeparator
 import com.shadcn.ui.components.sidebar.SidebarTrigger
+import com.shadcn.ui.components.sidebar.SidebarVariant
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.Content
 import dr.shadcn.kmp.SidebarRoute
 import dr.shadcn.kmp.navigation.SidebarNavigation
 
 @Composable
-fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick: (String) -> Unit) {
+fun SidebarLayoutPage() {
+    var selectedItem by remember { mutableStateOf("Dashboard") }
+    val sidebarNav = rememberNavController()
+
+    SidebarProvider(
+        defaultOpen = true,
+        variant = SidebarVariant.Sidebar,
+        collapsible = SidebarCollapsible.Icon,
+    ) {
+        Sidebar {
+            SidebarHeader(
+                title = "My App",
+                icon = {
+                    Button(size = ButtonSize.Icon, onClick = {}) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "logo",
+                            tint = MaterialTheme.styles.sidebarPrimaryForeground,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                },
+            )
+            SidebarContent {
+                AppSidebarMenu(sidebarNav, selectedItem) { selectedItem = it }
+            }
+            SidebarFooter {
+                NavUser(name = "shadcn", email = "m@example.com")
+            }
+        }
+        SidebarInset {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.styles.background)
+                    .padding(16.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SidebarTrigger()
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = selectedItem,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.styles.foreground,
+                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                SidebarNavigation(sidebarNav)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppSidebarMenu(
+    sidebarNav: NavHostController,
+    selectedMenu: String,
+    onMenuClick: (String) -> Unit,
+) {
     val menus = listOf(
         Content("Dashboard", SidebarRoute.Dashboard.path),
         Content("Projects", SidebarRoute.Project.path),
         Content("Tasks", SidebarRoute.Task.path),
     )
-    SidebarContent {
-        SidebarGroup {
-            SidebarGroupLabel("Navigation")
-            SidebarGroupContent {
-                SidebarMenu {
-                    menus.forEach { item ->
-                        val icon: @Composable () -> Unit = {
-                            Icon(
-                                imageVector = when (item.title) {
-                                    "Dashboard" -> Icons.Default.Home
-                                    "Projects" -> Icons.Default.Star
-                                    else -> Icons.AutoMirrored.Filled.List
-                                },
-                                contentDescription = item.title,
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.styles.sidebarForeground
-                            )
-                        }
+
+    SidebarGroup {
+        SidebarGroupLabel("Navigation")
+        SidebarGroupContent {
+            SidebarMenu {
+                menus.forEach { item ->
+                    SidebarMenuItem {
                         SidebarMenuButton(
                             onClick = {
                                 onMenuClick(item.title)
                                 sidebarNav.navigate(item.route)
                             },
                             isActive = selectedMenu == item.title,
-                            icon = icon
+                            tooltip = item.title,
+                            icon = {
+                                Icon(
+                                    imageVector = when (item.title) {
+                                        "Dashboard" -> Icons.Default.Home
+                                        "Projects" -> Icons.Default.Star
+                                        else -> Icons.AutoMirrored.Filled.List
+                                    },
+                                    contentDescription = item.title,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.styles.sidebarForeground,
+                                )
+                            },
                         ) {
                             Text(
                                 text = item.title,
                                 color = MaterialTheme.styles.sidebarForeground,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
                             if (item.title == "Tasks") {
                                 SidebarMenuBadge {
                                     Text(
                                         text = "3",
                                         fontSize = 12.sp,
-                                        color = MaterialTheme.styles.sidebarForeground.copy(alpha = 0.7f)
+                                        color = MaterialTheme.styles.sidebarForeground.copy(alpha = 0.7f),
                                     )
                                 }
                             }
@@ -106,117 +178,103 @@ fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick:
                 }
             }
         }
+    }
 
-        SidebarSeparator()
+    SidebarSeparator()
 
-        SidebarGroup {
-            SidebarGroupLabel("Settings")
-            SidebarGroupContent {
-                SidebarMenu {
-                    SidebarMenuButton(
-                        text = "General",
-                        onClick = { },
-                        icon = {
-                            Icon(
-                                Icons.Default.Settings,
-                                contentDescription = "Settings",
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.styles.sidebarForeground
-                            )
-                        }
-                    )
-                    SidebarMenuSub {
-                        SidebarMenuSubButton(onClick = { }) {
-                            Text(
-                                text = "Profile",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.styles.sidebarForeground
-                            )
-                        }
-                        SidebarMenuSubButton(onClick = { }) {
-                            Text(
-                                text = "Notifications",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.styles.sidebarForeground
-                            )
-                        }
+    SidebarGroup {
+        SidebarGroupLabel("Settings")
+        SidebarGroupContent {
+            SidebarMenu {
+                SidebarMenuButton(
+                    text = "General",
+                    onClick = { },
+                    icon = {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.styles.sidebarForeground,
+                        )
+                    },
+                )
+                SidebarMenuSub {
+                    SidebarMenuSubButton(onClick = { }) {
+                        Text(
+                            text = "Profile",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.styles.sidebarForeground,
+                        )
                     }
-                    SidebarMenuButton(
-                        text = "Calendar",
-                        onClick = { },
-                        icon = {
-                            Icon(
-                                Icons.Default.DateRange,
-                                contentDescription = "Calendar",
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.styles.sidebarForeground
-                            )
-                        }
-                    )
+                    SidebarMenuSubButton(onClick = { }) {
+                        Text(
+                            text = "Notifications",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.styles.sidebarForeground,
+                        )
+                    }
                 }
+                SidebarMenuButton(
+                    text = "Calendar",
+                    onClick = { },
+                    icon = {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Calendar",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.styles.sidebarForeground,
+                        )
+                    },
+                )
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
+/**
+ * NavUser footer — mirrors shadcn's `NavUser` from dashboard-01/app-sidebar.tsx.
+ *
+ * Renders an avatar + name/email + chevron inside a Large [SidebarMenuButton]. Since
+ * the menu button collapses to icon-only in icon mode, the footer naturally reduces to
+ * just the avatar when the sidebar is collapsed.
+ */
 @Composable
-fun SidebarLayoutPage() {
-    var selectedItem by remember { mutableStateOf("Dashboard") }
-    val sidebarNav = rememberNavController()
-    SidebarProvider(
-        defaultOpen = true,
-        collapsible = SidebarCollapsible.Icon
-    ) {
-        SidebarLayout(
-            sidebarHeader = {
-                SidebarHeader {
-                    Text(
-                        text = "My App",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 20.dp),
-                        color = MaterialTheme.styles.sidebarForeground
+private fun NavUser(name: String, email: String) {
+    SidebarMenu {
+        SidebarMenuItem {
+            SidebarMenuButton(
+                onClick = { },
+                size = SidebarMenuButtonSize.Large,
+                tooltip = name,
+                icon = {
+                    Avatar(
+                        model = "https://avatars.githubusercontent.com/u/124599?v=4",
+                        size = 32.dp,
+                        fallbackText = name.take(2).uppercase(),
                     )
-                }
-            },
-            sidebarContent = {
-                AppSidebar(sidebarNav, selectedItem) { selectedItem = it }
-            },
-            sidebarFooter = {
-                SidebarFooter {
-                    Text(
-                        text = "© 2025 Shadcn Compose",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.styles.mutedForeground
-                    )
-                }
-            }
-        ) {
-            // Main content
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.styles.background)
-                    .padding(16.dp)
+                },
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SidebarTrigger()
-                    Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = selectedItem,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.styles.foreground
+                        text = name,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.styles.sidebarForeground,
+                        maxLines = 1,
+                    )
+                    Text(
+                        text = email,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.styles.mutedForeground,
+                        maxLines = 1,
                     )
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-                SidebarNavigation(sidebarNav)
+                Icon(
+                    imageVector = Icons.Default.UnfoldMore,
+                    contentDescription = "Open user menu",
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.styles.sidebarForeground,
+                )
             }
         }
     }

@@ -15,6 +15,7 @@ import dr.shadcn.kmp.pages.MainLayout
 import dr.shadcn.kmp.pages.MainViewModel
 import dr.shadcn.kmp.pages.components.SidebarInsetPage
 import dr.shadcn.kmp.pages.components.SidebarLayoutPage
+import dr.shadcn.kmp.pages.components.SidebarOffcanvasPage
 
 @Composable
 fun AppNavigation(
@@ -49,6 +50,10 @@ fun AppNavigation(
 
         composable(TopLevelRoute.SidebarInsetGraph.path) {
             SidebarInsetPage()
+        }
+
+        composable(TopLevelRoute.SidebarOffcanvasGraph.path) {
+            SidebarOffcanvasPage()
         }
 
 //        composable(TopLevelRoute.WebviewGraph.path) { backstack ->

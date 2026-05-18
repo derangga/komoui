@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,12 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -53,13 +51,15 @@ import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.ButtonVariant
 import com.shadcn.ui.components.Dialog
 import com.shadcn.ui.components.Input
+import com.shadcn.ui.components.sidebar.Sidebar
+import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
 import com.shadcn.ui.components.sidebar.SidebarFooter
 import com.shadcn.ui.components.sidebar.SidebarGroup
 import com.shadcn.ui.components.sidebar.SidebarGroupContent
-import com.shadcn.ui.components.sidebar.SidebarHeader
 import com.shadcn.ui.components.sidebar.SidebarGroupLabel
-import com.shadcn.ui.components.sidebar.SidebarLayout
+import com.shadcn.ui.components.sidebar.SidebarHeader
+import com.shadcn.ui.components.sidebar.SidebarInset
 import com.shadcn.ui.components.sidebar.SidebarMenu
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
 import com.shadcn.ui.components.sidebar.SidebarProvider
@@ -71,7 +71,11 @@ import dr.shadcn.kmp.icons.AppIcons
 import dr.shadcn.kmp.navigation.ComponentNavigation
 
 @Composable
-fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick: (String) -> Unit) {
+private fun ColumnScope.AppSidebarContent(
+    sidebarNav: NavHostController,
+    selectedMenu: String,
+    onMenuClick: (String) -> Unit,
+) {
     val menus = HomeContent.contents
     SidebarContent {
         SidebarMenuButton(
@@ -98,8 +102,6 @@ fun AppSidebar(sidebarNav: NavHostController, selectedMenu: String, onMenuClick:
                 }
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -114,32 +116,28 @@ fun MainLayout(rootNav: NavHostController, viewModel: MainViewModel, isDark: Boo
     var showDialog by remember { mutableStateOf(false) }
     val searchTxt by viewModel.searchQuery.collectAsStateWithLifecycle()
     val filteredMenu by viewModel.searchResults.collectAsStateWithLifecycle()
-    SidebarProvider {
-        SidebarLayout(
-            sidebarHeader = {
-                SidebarHeader {
-                    Text(
-                        text = "Shadcn Compose",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 20.dp),
-                        color = MaterialTheme.styles.sidebarForeground
-                    )
-                }
-            },
-            sidebarContent = {
-                AppSidebar(sidebarNav = childNav, selectedMenu = selectedMenu) { selectedMenu = it }
-            },
-            sidebarFooter = {
-                SidebarFooter {
-                    Text(
-                        text = "© 2025 Shadcn Compose",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.styles.mutedForeground
-                    )
-                }
-            }
-        ) {
+    SidebarProvider(
+        defaultOpen = true,
+        collapsible = SidebarCollapsible.Offcanvas,
+    ) {
+        Sidebar {
+            SidebarHeader(
+                title = "Shadcn Compose",
+                icon = {
+                    Button(size = ButtonSize.Icon, onClick = {  }) {
+                        Icon(
+                            AppIcons.Box,
+                            contentDescription = "logo",
+                            tint = MaterialTheme.styles.sidebarPrimaryForeground,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                },
+            )
+            AppSidebarContent(sidebarNav = childNav, selectedMenu = selectedMenu) { selectedMenu = it }
+            SidebarFooter(text = "© 2025 Shadcn Compose")
+        }
+        SidebarInset {
             Scaffold(
                 topBar = {
                     TopAppBar(
