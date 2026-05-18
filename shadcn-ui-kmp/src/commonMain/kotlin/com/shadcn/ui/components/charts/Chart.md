@@ -1,19 +1,8 @@
----
-name: shadcn-charts
-user-invocable: false
-description: Build, modify, or extend the Compose Multiplatform chart components (BarChart, LineChart, AreaChart) in shadcn-ui-kmp. Use when the user mentions a chart, edits files under shadcn-ui-kmp/src/commonMain/kotlin/com/shadcn/ui/components/charts/, or asks to add a new chart family (pie, radar, scatter, etc.). Covers the layout gotchas, the pinned-y-axis + scrollable-plot architecture, and a step-by-step recipe for adding a new chart type.
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Grep
-  - Glob
----
+# Chart components
 
-# shadcn-charts
+Hand-rolled Compose Multiplatform chart primitives in `commonMain` (Android + iOS). No external charting lib. All shared logic lives in `ChartCommon.kt` next to this file.
 
-Hand-rolled Compose Multiplatform chart primitives in `commonMain` (Android + iOS). No external charting lib. All shared logic lives in `shadcn-ui-kmp/src/commonMain/kotlin/com/shadcn/ui/components/charts/ChartCommon.kt`.
+Public charts: `BarChart`, `LineChart`, `AreaChart`. Demo lives at `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/pages/components/ChartPage.kt`.
 
 ## Pitfalls — read first
 
@@ -118,8 +107,6 @@ BarChart.kt / LineChart.kt / AreaChart.kt
     }
 ```
 
-Demo: `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/pages/components/ChartPage.kt`.
-
 ## Recipe — adding a new chart family
 
 Worked example: `ScatterChart`. Same shape applies to `PieChart`, `RadarChart`, `RadialChart` (those need polar-coordinate primitives instead of `drawAxesAndGrid`, so add them to ChartCommon first).
@@ -173,7 +160,7 @@ Worked example: `ScatterChart`. Same shape applies to `PieChart`, `RadarChart`, 
 
 ## Files at a glance
 
-- `shadcn-ui-kmp/src/commonMain/kotlin/com/shadcn/ui/components/charts/ChartCommon.kt` — types, helpers, drawing primitives
-- `shadcn-ui-kmp/src/commonMain/kotlin/com/shadcn/ui/components/charts/{Bar,Line,Area}Chart.kt` — public charts
+- `ChartCommon.kt` — types, helpers, drawing primitives
+- `BarChart.kt` / `LineChart.kt` / `AreaChart.kt` — public charts
 - `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/pages/components/ChartPage.kt` — demo
 - `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/{Route.kt,HomeContent.kt,navigation/MainNavigation.kt}` — demo route wiring (Chart route already exists; only add new demo sections, no new route needed for chart variants)
