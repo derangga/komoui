@@ -33,7 +33,7 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("1. Sidebar layout")
+        Text("1. Standard sidebar (variant = Sidebar)")
         Accordion(
             items =
                 listOf(
@@ -41,7 +41,7 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
                         id = "item-1",
                         header = { Text("Details") },
                         content = {
-                            Text("SidebarLayout is a high-level composable designed to manage both the sidebar and the main content layout in a single component. It handles their placement, behavior, and animations based on the device type (mobile or desktop) and the sidebar's state (open or closed)")
+                            Text("The standard sidebar mirrors shadcn/ui: place Sidebar and SidebarInset as siblings inside SidebarProvider. On desktop they render as a Row; on mobile (viewport < 768.dp) SidebarProvider hosts them inside a Material3 ModalNavigationDrawer. This demo uses collapsible = Icon so the sidebar can collapse to an icon rail with tooltips.")
                         }
                     )
                 )
@@ -50,12 +50,12 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
         ContentPageWithTitle {
             Button(
                 onClick = { parentNav.navigate(TopLevelRoute.SidebarLayoutGraph.path) }
-            ) { Text("Open page sidebar layout") }
+            ) { Text("Open standard sidebar demo") }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("2. Sidebar inset")
+        Text("2. Inset sidebar (variant = Inset)")
         Accordion(
             items =
                 listOf(
@@ -63,7 +63,7 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
                         id = "item-1",
                         header = { Text("Details") },
                         content = {
-                            Text("SidebarInset is a composable focused on managing the main content area, adjusting its layout based on the sidebar's presence. It’s meant to work alongside a separately placed sidebar, giving you more control over the overall layout")
+                            Text("The inset variant lets the sidebar background extend to the screen edge and wraps the main content (SidebarInset) in a rounded, shadowed card. SidebarInset reads the variant from LocalSidebarState and adjusts its margin/radius/elevation automatically.")
                         }
                     )
                 )
@@ -72,7 +72,7 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
         ContentPageWithTitle {
             Button(
                 onClick = { parentNav.navigate(TopLevelRoute.SidebarInsetGraph.path) }
-            ) { Text("Open page sidebar inset") }
+            ) { Text("Open inset sidebar demo") }
         }
     }
 }

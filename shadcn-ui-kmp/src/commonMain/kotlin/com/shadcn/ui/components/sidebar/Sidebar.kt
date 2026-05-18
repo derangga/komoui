@@ -1,29 +1,24 @@
 package com.shadcn.ui.components.sidebar
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,126 +31,254 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import com.shadcn.ui.components.Button
 import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.ButtonVariant
-import com.shadcn.ui.components.Skeleton
+import com.shadcn.ui.components.Input
+import com.shadcn.ui.components.InputVariant
 import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 
 // ---------------------------------------------------------------------------
-// Internal helper: Mobile sidebar overlay (extracted from SidebarInset/Layout)
+// Sidebar root + SidebarInset — slot-registering composables.
+// They emit nothing themselves; the SidebarProvider's layout renderer invokes
+// the registered slots in the correct position (Row on desktop, drawer on mobile).
 // ---------------------------------------------------------------------------
 
 /**
- * Internal helper that renders a mobile sidebar overlay with backdrop and slide animation.
+ * The sidebar's visual root. Registers its content into the provider's sidebar slot;
+ * placement (Row column on desktop, ModalDrawerSheet on mobile) is decided by
+ * [SidebarProvider] based on viewport.
  *
- * @param isOpen Whether the sidebar is currently open.
- * @param onDismiss Callback when the backdrop is tapped.
- * @param modifier Modifier for the root container.
- * @param sidebarContent The sidebar content to display in the overlay.
- */
-@Composable
-internal fun MobileSidebarOverlay(
-    isOpen: Boolean,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-    sidebarContent: @Composable () -> Unit
-) {
-    // Backdrop when sidebar is open
-    if (isOpen) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable { onDismiss() }
-                .zIndex(1f)
-        )
-    }
-
-    // Animated sidebar overlay
-    AnimatedVisibility(
-        visible = isOpen,
-        enter = slideInHorizontally(
-            initialOffsetX = { -it },
-            animationSpec = tween(300)
-        ),
-        exit = slideOutHorizontally(
-            targetOffsetX = { -it },
-            animationSpec = tween(300)
-        ),
-        modifier = Modifier.zIndex(2f)
-    ) {
-        sidebarContent()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Core sidebar components
-// ---------------------------------------------------------------------------
-
-private val ICON_RAIL_WIDTH = 48.dp
-
-/**
- * Main sidebar container.
- *
- * @param modifier Modifier to apply to the sidebar.
- * @param sidebarWidth Width of the sidebar on desktop.
- * @param mobileWidth Width of the sidebar on mobile.
- * @param content The sidebar content.
+ * Place [SidebarHeader], [SidebarContent], [SidebarFooter], and optionally [SidebarRail]
+ * inside.
  */
 @Composable
 fun Sidebar(
     modifier: Modifier = Modifier,
-    sidebarWidth: Dp = 256.dp,
-    mobileWidth: Dp = 288.dp,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sidebarState = LocalSidebarState.current
+    val slots = LocalSidebarSlots.current
+        ?: error("Sidebar must be used inside SidebarProvider.")
+    slots.sidebar = { SidebarShell(modifier = modifier, content = content) }
+}
 
-    val targetWidth = when {
-        sidebarState.isMobile -> mobileWidth
-        sidebarState.isCollapsedIcon -> ICON_RAIL_WIDTH
-        else -> sidebarWidth
+@Composable
+private fun SidebarShell(
+    modifier: Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val state = LocalSidebarState.current
+    val slots = LocalSidebarSlots.current!!
+
+    if (state.isMobile) {
+        Column(
+            modifier = modifier
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            content = content,
+        )
+        return
     }
-    val animatedWidth by animateDpAsState(
-        targetValue = targetWidth,
-        animationSpec = tween(200)
-    )
 
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .width(animatedWidth)
-            .background(
-                color = MaterialTheme.styles.sidebar,
-                shape = if (sidebarState.isMobile) {
-                    RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
-                } else {
-                    RoundedCornerShape(0.dp)
-                }
-            ),
-        horizontalAlignment = if (sidebarState.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start
-    ) {
-        content()
+    if (state.collapsible == SidebarCollapsible.Offcanvas && !state.isOpen) {
+        // Offcanvas closed on desktop: emit nothing so the row reclaims the space.
+        return
+    }
+
+    // Reset per-shell flags (rail) so this composition's `SidebarRail()` calls take effect.
+    slots.railEnabled = false
+
+    when (state.variant) {
+        SidebarVariant.Sidebar, SidebarVariant.Inset -> DesktopStandardSidebar(modifier, content)
+        SidebarVariant.Floating -> DesktopFloatingSidebar(modifier, content)
     }
 }
 
+@Composable
+private fun DesktopStandardSidebar(
+    modifier: Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val state = LocalSidebarState.current
+    val slots = LocalSidebarSlots.current!!
+    val styles = MaterialTheme.styles
+
+    val targetWidth = if (state.isCollapsedIcon) state.widthIcon else state.width
+    val animatedWidth by animateDpAsState(
+        targetValue = targetWidth,
+        animationSpec = state.animationSpec,
+        label = "sidebar-width",
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .width(animatedWidth)
+            .background(styles.sidebar),
+    ) {
+        Column(
+            // BG (above) extends to the screen edges so the system bars tint with the sidebar
+            // color; the actual content sits inside the safe area.
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars),
+            horizontalAlignment = if (state.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start,
+            content = content,
+        )
+        // After `content()` composes, slots.railEnabled reflects whether the user called SidebarRail().
+        if (slots.railEnabled) {
+            RailOverlay(side = state.side)
+        }
+    }
+}
+
+@Composable
+private fun DesktopFloatingSidebar(
+    modifier: Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val state = LocalSidebarState.current
+    val slots = LocalSidebarSlots.current!!
+    val styles = MaterialTheme.styles
+
+    // Floating-in-icon adds a little for outer padding + border (matches React's calc(width-icon + 1rem + 2px)).
+    val targetWidth = if (state.isCollapsedIcon) state.widthIcon + 18.dp else state.width
+    val animatedWidth by animateDpAsState(
+        targetValue = targetWidth,
+        animationSpec = state.animationSpec,
+        label = "sidebar-floating-width",
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .width(animatedWidth)
+            // Floating variant: the system bars sit outside the floating card.
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .padding(8.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = styles.sidebar,
+                    shape = RoundedCornerShape(MaterialTheme.radius.lg),
+                )
+                .border(
+                    width = 1.dp,
+                    color = styles.sidebarBorder,
+                    shape = RoundedCornerShape(MaterialTheme.radius.lg),
+                ),
+            horizontalAlignment = if (state.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start,
+            content = content,
+        )
+        if (slots.railEnabled) {
+            RailOverlay(side = state.side)
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.RailOverlay(side: SidebarSide) {
+    val state = LocalSidebarState.current
+    val styles = MaterialTheme.styles
+
+    Box(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(4.dp)
+            .align(if (side == SidebarSide.Left) Alignment.CenterEnd else Alignment.CenterStart)
+            .background(styles.sidebarBorder)
+            .clickable { state.toggleSidebar() },
+    )
+}
+
 /**
- * Sidebar trigger button (hamburger menu).
+ * Main content area sibling of [Sidebar]. Registers its body into the provider's inset slot;
+ * the provider places it as the flex-1 row child on desktop or the host content of the
+ * `ModalNavigationDrawer` on mobile.
  *
- * @param modifier Modifier to apply to the trigger button.
- * @param content Custom content for the trigger. Defaults to a hamburger menu icon.
+ * When `variant = SidebarVariant.Inset`, the body is wrapped in a margin + rounded + shadowed
+ * card (background = `styles.background`) so the sidebar color shows around it.
+ */
+@Composable
+fun SidebarInset(
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val slots = LocalSidebarSlots.current
+        ?: error("SidebarInset must be used inside SidebarProvider.")
+    slots.inset = { SidebarInsetShell(modifier = modifier, content = content) }
+}
+
+@Composable
+private fun SidebarInsetShell(
+    modifier: Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val state = LocalSidebarState.current
+    val styles = MaterialTheme.styles
+
+    val isMobile = state.isMobile
+    val isInset = state.variant == SidebarVariant.Inset && !isMobile
+    val insetShape = RoundedCornerShape(MaterialTheme.radius.xl)
+
+    val outerPadding = when {
+        !isInset -> Modifier
+        state.side == SidebarSide.Left -> {
+            // Match React: m-2, ml-0; when collapsed-to-icon, restore ml-2.
+            if (state.isCollapsedIcon) {
+                Modifier.padding(8.dp)
+            } else {
+                Modifier.padding(start = 0.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
+            }
+        }
+        else -> { // Right
+            if (state.isCollapsedIcon) {
+                Modifier.padding(8.dp)
+            } else {
+                Modifier.padding(start = 8.dp, top = 8.dp, end = 0.dp, bottom = 8.dp)
+            }
+        }
+    }
+
+    val cardModifier = if (isInset) {
+        Modifier
+            .shadow(elevation = 2.dp, shape = insetShape, clip = false)
+            .background(color = styles.background, shape = insetShape)
+    } else {
+        Modifier.background(styles.background)
+    }
+
+    // We rely on the parent (Row on desktop) to give us our weight; in mobile we just fill.
+    // systemBars padding keeps the inset card / content inside the safe area;
+    // for the inset variant, the provider's wrapper background extends behind the system bars.
+    val statusBarsModifier = if (isMobile) Modifier else Modifier.windowInsetsPadding(WindowInsets.systemBars)
+
+    Box(
+        modifier = (if (isMobile) Modifier.fillMaxSize() else Modifier.fillMaxHeight())
+            .then(statusBarsModifier)
+            .then(outerPadding)
+            .then(cardModifier)
+            .then(modifier),
+        content = content,
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Trigger and rail
+// ---------------------------------------------------------------------------
+
+/**
+ * Ghost icon button that toggles the sidebar in the active viewport.
+ *
+ * @param content Visual override. Defaults to a hamburger icon.
  */
 @Composable
 fun SidebarTrigger(
@@ -163,648 +286,226 @@ fun SidebarTrigger(
     content: @Composable () -> Unit = {
         Icon(
             Icons.Default.Menu,
-            contentDescription = "Toggle sidebar",
-            tint = MaterialTheme.styles.sidebarForeground
+            contentDescription = "Toggle Sidebar",
+            tint = MaterialTheme.styles.sidebarForeground,
         )
-    }
+    },
 ) {
-    val sidebarState = LocalSidebarState.current
-
+    val state = LocalSidebarState.current
     Button(
-        onClick = sidebarState.toggleSidebar,
+        onClick = { state.toggleSidebar() },
         modifier = modifier,
         size = ButtonSize.Icon,
-        variant = ButtonVariant.Ghost
+        variant = ButtonVariant.Ghost,
     ) {
         content()
     }
 }
 
 /**
- * Main content wrapper that adapts to sidebar.
- * Handles mobile overlay and desktop inset layout.
+ * Marker composable that opts the sidebar into rendering a thin clickable rail on its outer
+ * edge. The rail toggles open/closed when tapped. Hidden when `collapsible = Offcanvas`
+ * (matches React) and on mobile (the drawer responds to gestures).
  *
- * @param modifier Modifier to apply to the content area.
- * @param sidebarContent The sidebar content to display.
- * @param content The main content.
+ * Emits nothing on its own — place inside [Sidebar]'s content; the actual rail is drawn by
+ * the sidebar shell so it can position absolutely on the outer edge.
  */
 @Composable
-fun SidebarInset(
-    modifier: Modifier = Modifier,
-    sidebarContent: @Composable () -> Unit,
-    content: @Composable () -> Unit
-) {
-    val sidebarState = LocalSidebarState.current
-
-    if (sidebarState.isMobile) {
-        // Mobile: Sidebar overlays the content with a backdrop
-        Box(modifier = modifier.fillMaxSize()) {
-            content()
-
-            MobileSidebarOverlay(
-                isOpen = sidebarState.isOpen,
-                onDismiss = { sidebarState.closeSidebar() }
-            ) {
-                Sidebar {
-                    sidebarContent()
-                }
-            }
-        }
-    } else {
-        // Desktop: Adjust content area based on sidebar presence
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .then(if (sidebarState.isOpen) Modifier.padding(start = 16.dp) else Modifier)
-        ) {
-            content()
-        }
-    }
-}
-
-/**
- * Complete sidebar layout wrapper.
- * Provides a full sidebar + content layout with header, content, and footer slots.
- *
- * @param modifier Modifier to apply to the layout.
- * @param sidebarHeader Optional header content for the sidebar.
- * @param sidebarContent Optional main content for the sidebar.
- * @param sidebarFooter Optional footer content for the sidebar.
- * @param content The main content area.
- */
-@Composable
-fun SidebarLayout(
-    modifier: Modifier = Modifier,
-    sidebarHeader: @Composable (() -> Unit)? = null,
-    sidebarContent: @Composable (() -> Unit)? = null,
-    sidebarFooter: @Composable (() -> Unit)? = null,
-    content: @Composable () -> Unit
-) {
-    val sidebarState = LocalSidebarState.current
-
-    if (sidebarState.isMobile) {
-        // Mobile layout: Overlay
-        Box(modifier = modifier.fillMaxSize()) {
-            content()
-
-            MobileSidebarOverlay(
-                isOpen = sidebarState.isOpen,
-                onDismiss = { sidebarState.closeSidebar() }
-            ) {
-                Sidebar {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    sidebarHeader?.invoke()
-                    Box(modifier = Modifier.weight(1f)) {
-                        sidebarContent?.invoke()
-                    }
-                    sidebarFooter?.invoke()
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-            }
-        }
-    } else {
-        // Desktop layout: Side by side
-        Row(modifier = modifier.fillMaxSize()) {
-            when (sidebarState.collapsible) {
-                SidebarCollapsible.Icon -> {
-                    // Icon mode: always render, width animates between full and rail
-                    Sidebar {
-                        sidebarHeader?.invoke()
-                        Box(modifier = Modifier.weight(1f)) {
-                            sidebarContent?.invoke()
-                        }
-                        sidebarFooter?.invoke()
-                    }
-                }
-                SidebarCollapsible.None -> {
-                    // None: always show full sidebar, ignore toggle
-                    Sidebar {
-                        sidebarHeader?.invoke()
-                        Box(modifier = Modifier.weight(1f)) {
-                            sidebarContent?.invoke()
-                        }
-                        sidebarFooter?.invoke()
-                    }
-                }
-                SidebarCollapsible.Offcanvas -> {
-                    // Offcanvas: slide in/out
-                    AnimatedVisibility(
-                        visible = sidebarState.isOpen,
-                    ) {
-                        Sidebar {
-                            sidebarHeader?.invoke()
-                            Box(modifier = Modifier.weight(1f)) {
-                                sidebarContent?.invoke()
-                            }
-                            sidebarFooter?.invoke()
-                        }
-                    }
-                }
-            }
-
-            // Main content - takes remaining space
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            ) {
-                content()
-            }
-        }
-    }
+fun SidebarRail(@Suppress("UNUSED_PARAMETER") modifier: Modifier = Modifier) {
+    val slots = LocalSidebarSlots.current
+        ?: error("SidebarRail must be used inside Sidebar.")
+    val state = LocalSidebarState.current
+    if (state.isMobile) return
+    if (state.collapsible == SidebarCollapsible.Offcanvas) return
+    slots.railEnabled = true
 }
 
 // ---------------------------------------------------------------------------
-// Sidebar structural components
+// Structural slots — Header / Footer / Separator / Input / Content
 // ---------------------------------------------------------------------------
 
-/**
- * Scrollable content area of the sidebar.
- *
- * @param modifier Modifier to apply.
- * @param content The sidebar content.
- */
-@Composable
-fun SidebarContent(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val sidebarState = LocalSidebarState.current
-    val horizontalPadding = if (sidebarState.isCollapsedIcon) 4.dp else 16.dp
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = horizontalPadding)
-            .verticalScroll(rememberScrollState())
-    ) {
-        content()
-    }
-}
-
-/**
- * Sidebar header section.
- *
- * @param modifier Modifier to apply.
- * @param content The header content.
- */
+/** Sticky top section of the sidebar. Reduces padding when collapsed to icon. */
 @Composable
 fun SidebarHeader(
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sidebarState = LocalSidebarState.current
-    val padding = if (sidebarState.isCollapsedIcon) {
-        Modifier.padding(top = 24.dp, start = 4.dp, end = 4.dp)
-    } else {
-        Modifier.padding(top = 24.dp, start = 8.dp, end = 8.dp)
-    }
+    val state = LocalSidebarState.current
+    val horizontal = if (state.isCollapsedIcon) 4.dp else 8.dp
 
     Column(
         modifier = modifier
-            .defaultMinSize(minHeight = 64.dp)
             .fillMaxWidth()
-            .then(padding),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = if (sidebarState.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start
-    ) {
-        content()
-    }
+            .padding(horizontal = horizontal, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = if (state.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start,
+        content = content,
+    )
 }
 
 /**
- * Sidebar footer section.
+ * Brand-style header overload that mirrors `SidebarMenuButton`'s text overload: shows the
+ * [title] alongside an optional [icon] when expanded, and collapses to icon-only (or hides
+ * entirely when no icon is provided) when the sidebar is in icon mode.
  *
- * @param modifier Modifier to apply.
- * @param content The footer content.
+ * Use this instead of the slot overload when the header is a simple "logo + product name"
+ * pairing — it stays legible at every collapsed state without manual scope handling.
  */
+@Composable
+fun SidebarHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    icon: (@Composable () -> Unit)? = null,
+) {
+    val state = LocalSidebarState.current
+
+    if (state.isCollapsedIcon) {
+        if (icon == null) return
+        SidebarHeader(modifier = modifier) {
+            icon()
+        }
+        return
+    }
+
+    SidebarHeader(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            if (icon != null) icon()
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.styles.sidebarForeground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+/** Sticky bottom section of the sidebar. Reduces padding when collapsed to icon. */
 @Composable
 fun SidebarFooter(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sidebarState = LocalSidebarState.current
-    val padding = if (sidebarState.isCollapsedIcon) {
-        Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
-    } else {
-        Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
-    }
+    val state = LocalSidebarState.current
+    val horizontal = if (state.isCollapsedIcon) 4.dp else 8.dp
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(padding),
-        contentAlignment = if (sidebarState.isCollapsedIcon) Alignment.Center else Alignment.TopStart
-    ) {
-        content()
-    }
-}
-
-/**
- * Groups related sidebar items together.
- *
- * @param modifier Modifier to apply.
- * @param content The group content.
- */
-@Composable
-fun SidebarGroup(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        content()
-    }
-}
-
-/**
- * Label for a sidebar group. Hidden in collapsed icon mode.
- *
- * @param text The label text.
- * @param modifier Modifier to apply.
- */
-@Composable
-fun SidebarGroupLabel(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    val sidebarState = LocalSidebarState.current
-    if (sidebarState.isCollapsedIcon) return
-
-    Text(
-        text = text,
-        modifier = modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Medium,
-        color = MaterialTheme.styles.sidebarForeground.copy(alpha = 0.7f)
+            .padding(horizontal = horizontal, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = if (state.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start,
+        content = content,
     )
 }
 
 /**
- * Label for a sidebar group.
- * @see SidebarGroupLabel
+ * Brand-style footer overload. Mirrors [SidebarHeader]'s text overload: shows the [text]
+ * (e.g. a copyright line or username) alongside an optional [icon] when expanded, and
+ * collapses to icon-only — or hides entirely when no icon is provided — in icon mode.
+ *
+ * Matches shadcn/ui's behavior, where text-only footer content disappears in icon mode and
+ * avatar + text patterns reduce to just the avatar. For richer footer content (dropdowns,
+ * user menus), use the slot overload with [SidebarMenu] / [SidebarMenuButton] inside, which
+ * already adapt to icon mode.
  */
-@Deprecated("Use SidebarGroupLabel instead", ReplaceWith("SidebarGroupLabel(text, modifier)"))
 @Composable
-fun SidebarLabel(
+fun SidebarFooter(
     text: String,
-    modifier: Modifier = Modifier
-) {
-    SidebarGroupLabel(text, modifier)
-}
-
-/**
- * Wrapper for sidebar group content.
- *
- * @param modifier Modifier to apply.
- * @param content The group content.
- */
-@Composable
-fun SidebarGroupContent(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        content()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Sidebar menu components
-// ---------------------------------------------------------------------------
-
-/**
- * Container for sidebar menu items.
- *
- * @param modifier Modifier to apply.
- * @param content The menu items.
- */
-@Composable
-fun SidebarMenu(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        content()
-    }
-}
-
-/**
- * A clickable sidebar menu item container.
- *
- * @param onClick Callback when the item is clicked.
- * @param modifier Modifier to apply.
- * @param content The item content.
- */
-@Composable
-fun SidebarMenuItem(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(MaterialTheme.radius.md))
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        content()
-    }
-}
-
-/**
- * Slot-based sidebar menu button with icon and trailing content support.
- * In collapsed icon mode, only the icon is shown (centered).
- *
- * @param onClick Callback when the button is clicked.
- * @param modifier Modifier to apply.
- * @param isActive Whether this button is currently active/selected.
- * @param icon Optional leading icon composable.
- * @param content The button content (text and optional trailing elements).
- */
-@Composable
-fun SidebarMenuButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isActive: Boolean = false,
     icon: (@Composable () -> Unit)? = null,
-    content: @Composable RowScope.() -> Unit
 ) {
-    val sidebarState = LocalSidebarState.current
-    val styles = MaterialTheme.styles
-    val backgroundColor = if (isActive) styles.sidebarAccent else Color.Unspecified
-    val contentColor = if (isActive) styles.sidebarAccentForeground else styles.sidebarForeground
+    val state = LocalSidebarState.current
 
-    if (sidebarState.isCollapsedIcon) {
-        // Icon mode: show only icon, centered
-        Box(
-            modifier = modifier
-                .size(ICON_RAIL_WIDTH - 8.dp)
-                .clip(RoundedCornerShape(MaterialTheme.radius.md))
-                .background(backgroundColor)
-                .clickable {
-                    onClick()
-                    if (sidebarState.isMobile) sidebarState.closeSidebar()
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            if (icon != null) {
-                icon()
-            }
+    if (state.isCollapsedIcon) {
+        if (icon == null) return
+        SidebarFooter(modifier = modifier) {
+            icon()
         }
-    } else {
+        return
+    }
+
+    SidebarFooter(modifier = modifier) {
         Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(MaterialTheme.radius.md))
-                .background(backgroundColor)
-                .clickable {
-                    onClick()
-                    if (sidebarState.isMobile) sidebarState.closeSidebar()
-                }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (icon != null) {
-                Box(modifier = Modifier.size(20.dp)) {
-                    icon()
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            content()
+            if (icon != null) icon()
+            Text(
+                text = text,
+                fontSize = 12.sp,
+                color = MaterialTheme.styles.mutedForeground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
 
-/**
- * Convenience overload of [SidebarMenuButton] with a text label.
- *
- * @param text The button label text.
- * @param onClick Callback when the button is clicked.
- * @param modifier Modifier to apply.
- * @param isActive Whether this button is currently active/selected.
- * @param icon Optional leading icon composable.
- */
-@Composable
-fun SidebarMenuButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isActive: Boolean = false,
-    icon: (@Composable () -> Unit)? = null
-) {
-    val styles = MaterialTheme.styles
-    val textColor = if (isActive) styles.sidebarAccentForeground else styles.sidebarForeground
-
-    SidebarMenuButton(
-        onClick = onClick,
-        modifier = modifier,
-        isActive = isActive,
-        icon = icon
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-// ---------------------------------------------------------------------------
-// New sidebar components
-// ---------------------------------------------------------------------------
-
-/**
- * A horizontal separator for the sidebar.
- * In collapsed icon mode, renders as a short centered line.
- *
- * @param modifier Modifier to apply.
- */
+/** Horizontal divider styled with the sidebar border color. */
 @Composable
 fun SidebarSeparator(modifier: Modifier = Modifier) {
-    val sidebarState = LocalSidebarState.current
-    val horizontalPadding = if (sidebarState.isCollapsedIcon) 8.dp else 8.dp
-
     HorizontalDivider(
-        modifier = modifier.padding(horizontal = horizontalPadding, vertical = 4.dp),
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         thickness = 1.dp,
-        color = MaterialTheme.styles.sidebarBorder
+        color = MaterialTheme.styles.sidebarBorder,
     )
 }
 
 /**
- * A badge for sidebar menu buttons. Hidden in collapsed icon mode.
- * Typically placed as trailing content inside [SidebarMenuButton].
- *
- * @param modifier Modifier to apply.
- * @param content The badge content (e.g., a count or status indicator).
+ * Sidebar-themed text input. Thin wrapper around [Input]. Mirrors React's [SidebarInput]
+ * which uses the host background (not the sidebar background) so the field stays legible.
  */
 @Composable
-fun SidebarMenuBadge(
+fun SidebarInput(
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    placeholder: String = "",
+    enabled: Boolean = true,
+    singleLine: Boolean = true,
 ) {
-    val sidebarState = LocalSidebarState.current
-    if (sidebarState.isCollapsedIcon) return
-
-    Box(
-        modifier = modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        content()
-    }
+    Input(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.fillMaxWidth(),
+        placeholder = placeholder,
+        enabled = enabled,
+        singleLine = singleLine,
+        variant = InputVariant.Outlined,
+    )
 }
 
 /**
- * Container for nested sub-menu items. Hidden in collapsed icon mode.
- * Renders with a left border and indentation.
+ * Scrollable main content region of the sidebar. Takes the remaining vertical space inside
+ * [Sidebar]. Scrolling is disabled when collapsed to icon to avoid scrollbar artifacts on
+ * the narrow rail.
  *
- * @param modifier Modifier to apply.
- * @param content The sub-menu items.
+ * Must be called inside [Sidebar]'s [ColumnScope] so it can claim `weight(1f)`.
  */
 @Composable
-fun SidebarMenuSub(
+fun ColumnScope.SidebarContent(
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sidebarState = LocalSidebarState.current
-    if (sidebarState.isCollapsedIcon) return
-
-    val borderColor = MaterialTheme.styles.sidebarBorder
+    val state = LocalSidebarState.current
+    val horizontal = if (state.isCollapsedIcon) 4.dp else 8.dp
+    val scrollModifier = if (state.isCollapsedIcon) Modifier else Modifier.verticalScroll(rememberScrollState())
 
     Column(
         modifier = modifier
-            .padding(start = 24.dp)
-            .drawBehind {
-                drawLine(
-                    color = borderColor,
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, size.height),
-                    strokeWidth = 1.dp.toPx()
-                )
-            }
-            .padding(start = 8.dp)
-    ) {
-        content()
-    }
-}
-
-/**
- * A button for sub-menu items. Smaller than [SidebarMenuButton].
- * Auto-closes the sidebar on mobile when clicked.
- *
- * @param onClick Callback when the button is clicked.
- * @param modifier Modifier to apply.
- * @param isActive Whether this button is currently active/selected.
- * @param content The button content.
- */
-@Composable
-fun SidebarMenuSubButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isActive: Boolean = false,
-    content: @Composable RowScope.() -> Unit
-) {
-    val sidebarState = LocalSidebarState.current
-    val styles = MaterialTheme.styles
-    val backgroundColor = if (isActive) styles.sidebarAccent else Color.Unspecified
-
-    Row(
-        modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(MaterialTheme.radius.md))
-            .background(backgroundColor)
-            .clickable {
-                onClick()
-                if (sidebarState.isMobile) sidebarState.closeSidebar()
-            }
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        content()
-    }
-}
-
-/**
- * An action button for sidebar menu items (e.g., a more/options button).
- * Hidden in collapsed icon mode. Rendered as a ghost icon button at the trailing edge.
- *
- * @param onClick Callback when the action is clicked.
- * @param modifier Modifier to apply.
- * @param content The action content (typically an icon).
- */
-@Composable
-fun SidebarMenuAction(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    val sidebarState = LocalSidebarState.current
-    if (sidebarState.isCollapsedIcon) return
-
-    Button(
-        onClick = onClick,
-        modifier = modifier.size(28.dp),
-        size = ButtonSize.Icon,
-        variant = ButtonVariant.Ghost
-    ) {
-        content()
-    }
-}
-
-/**
- * A skeleton loading placeholder that mimics a sidebar menu button.
- *
- * @param modifier Modifier to apply.
- * @param showIcon Whether to show an icon skeleton placeholder.
- */
-@Composable
-fun SidebarMenuSkeleton(
-    modifier: Modifier = Modifier,
-    showIcon: Boolean = true
-) {
-    val sidebarState = LocalSidebarState.current
-
-    if (sidebarState.isCollapsedIcon) {
-        // Icon mode: just show icon skeleton
-        if (showIcon) {
-            Skeleton(
-                modifier = modifier
-                    .size(20.dp),
-                shape = RoundedCornerShape(MaterialTheme.radius.md)
-            )
-        }
-    } else {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (showIcon) {
-                Skeleton(
-                    modifier = Modifier.size(20.dp),
-                    shape = CircleShape
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            Skeleton(
-                modifier = Modifier
-                    .height(14.dp)
-                    .fillMaxWidth()
-            )
-        }
-    }
+            .weight(1f, fill = true)
+            .padding(horizontal = horizontal)
+            .then(scrollModifier),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        content = content,
+    )
 }
