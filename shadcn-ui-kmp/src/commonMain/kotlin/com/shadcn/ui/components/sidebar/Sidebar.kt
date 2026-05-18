@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,6 +42,7 @@ import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.ButtonVariant
 import com.shadcn.ui.components.Input
 import com.shadcn.ui.components.InputVariant
+import com.shadcn.ui.themes.drawShadows
 import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 
@@ -248,10 +250,13 @@ private fun SidebarInsetShell(
         }
     }
 
+    val shadow = MaterialTheme.styles.shadow()
     val cardModifier = if (isInset) {
         Modifier
-            .shadow(elevation = 2.dp, shape = insetShape, clip = false)
+            .drawShadows(MaterialTheme.radius.xl, shadow)
+            .clip(insetShape)
             .background(color = styles.background, shape = insetShape)
+            .border(1.dp, styles.border, insetShape)
     } else {
         Modifier.background(styles.background)
     }
@@ -259,7 +264,7 @@ private fun SidebarInsetShell(
     // We rely on the parent (Row on desktop) to give us our weight; in mobile we just fill.
     // systemBars padding keeps the inset card / content inside the safe area;
     // for the inset variant, the provider's wrapper background extends behind the system bars.
-    val statusBarsModifier = if (isMobile) Modifier else Modifier.windowInsetsPadding(WindowInsets.systemBars)
+     val statusBarsModifier = if (isInset) Modifier.windowInsetsPadding(WindowInsets.systemBars) else Modifier
 
     Box(
         modifier = (if (isMobile) Modifier.fillMaxSize() else Modifier.fillMaxHeight())
