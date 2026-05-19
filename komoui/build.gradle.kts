@@ -38,7 +38,7 @@ kotlin {
     // A step-by-step guide on how to include this library in an XCode
     // project can be found here:
     // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "shadcn-ui-kmpKit"
+    val xcfName = "KomoUI"
 
     iosX64 {
         binaries.framework {
@@ -119,16 +119,16 @@ mavenPublishing {
     // Define coordinates for the published artifact
     coordinates(
         groupId = "io.github.derangga",
-        artifactId = "shadcn-ui-kmp",
-        version = "0.2.2"
+        artifactId = "komoui",
+        version = "0.3.0"
     )
 
     // Configure POM metadata for the published artifact
     pom {
-        name.set("Shadcn UI KMP")
-        description.set("Shadcn-Compose is a UI kit for Android Jetpack Compose, inspired by the principles and components of shadcn/ui. This library provides a set of beautifully designed and customizable Compose components to help you build modern and consistent user interfaces with ease")
+        name.set("KomoUI")
+        description.set("Compose Multiplatform UI components for Android and iOS, inspired by the design language of shadcn/ui.")
         inceptionYear.set("2025")
-        url.set("https://github.com/derangga/shadcn-ui-kmp")
+        url.set("https://github.com/derangga/komoui")
 
         licenses {
             license {
@@ -148,7 +148,7 @@ mavenPublishing {
 
         // Specify SCM information
         scm {
-            url.set("https://github.com/derangga/shadcn-ui-kmp")
+            url.set("https://github.com/derangga/komoui")
         }
     }
 
