@@ -1,6 +1,7 @@
 package dr.shadcn.kmp.pages.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.DateRange
@@ -33,8 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shadcn.ui.components.Avatar
-import com.shadcn.ui.components.Button
-import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.sidebar.Sidebar
 import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
@@ -52,10 +52,10 @@ import com.shadcn.ui.components.sidebar.SidebarMenuItem
 import com.shadcn.ui.components.sidebar.SidebarMenuSub
 import com.shadcn.ui.components.sidebar.SidebarMenuSubButton
 import com.shadcn.ui.components.sidebar.SidebarProvider
-import com.shadcn.ui.components.sidebar.SidebarRail
 import com.shadcn.ui.components.sidebar.SidebarSeparator
 import com.shadcn.ui.components.sidebar.SidebarTrigger
 import com.shadcn.ui.components.sidebar.SidebarVariant
+import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.Content
 import dr.shadcn.kmp.SidebarRoute
@@ -75,7 +75,13 @@ fun SidebarLayoutPage() {
             SidebarHeader(
                 title = "My App",
                 icon = {
-                    Button(size = ButtonSize.Icon, onClick = {}) {
+                    Box(
+                        modifier = Modifier.size(28.dp).background(
+                            MaterialTheme.styles.foreground,
+                            RoundedCornerShape(MaterialTheme.radius.md),
+                        ),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Icon(
                             Icons.Default.Star,
                             contentDescription = "logo",
@@ -97,7 +103,7 @@ fun SidebarLayoutPage() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.styles.background)
-                    .padding(16.dp),
+                    .padding(start = 8.dp, end = 8.dp, top = 28.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

@@ -1,6 +1,7 @@
 package dr.shadcn.kmp.pages.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
@@ -45,6 +47,7 @@ import com.shadcn.ui.components.sidebar.SidebarMenuItem
 import com.shadcn.ui.components.sidebar.SidebarProvider
 import com.shadcn.ui.components.sidebar.SidebarTrigger
 import com.shadcn.ui.components.sidebar.SidebarVariant
+import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.Content
 import dr.shadcn.kmp.SidebarRoute
@@ -75,7 +78,13 @@ fun SidebarOffcanvasPage() {
             SidebarHeader(
                 title = "My App",
                 icon = {
-                    Button(size = ButtonSize.Icon, onClick = {}) {
+                    Box(
+                        modifier = Modifier.size(28.dp).background(
+                            MaterialTheme.styles.foreground,
+                            RoundedCornerShape(MaterialTheme.radius.md),
+                        ),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Icon(
                             Icons.Default.Star,
                             contentDescription = "logo",
@@ -132,7 +141,7 @@ fun SidebarOffcanvasPage() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.styles.background)
-                    .padding(16.dp),
+                    .padding(start = 8.dp, end = 8.dp, top = 28.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

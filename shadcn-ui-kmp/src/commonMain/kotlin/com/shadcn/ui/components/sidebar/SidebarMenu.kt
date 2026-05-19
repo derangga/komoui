@@ -67,8 +67,10 @@ fun SidebarMenu(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val state = LocalSidebarState.current
     Column(
         modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = if (state.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(2.dp),
         content = content,
     )
@@ -83,8 +85,10 @@ fun SidebarMenuItem(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    val state = LocalSidebarState.current
     Box(
         modifier = modifier.fillMaxWidth(),
+        contentAlignment = if (state.isCollapsedIcon) Alignment.Center else Alignment.TopStart,
         content = content,
     )
 }

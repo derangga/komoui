@@ -2,6 +2,7 @@ package dr.shadcn.kmp.pages
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DarkMode
@@ -64,6 +66,7 @@ import com.shadcn.ui.components.sidebar.SidebarMenu
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
 import com.shadcn.ui.components.sidebar.SidebarProvider
 import com.shadcn.ui.components.sidebar.SidebarTrigger
+import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 import dr.shadcn.kmp.HomeContent
 import dr.shadcn.kmp.MainRoute
@@ -124,12 +127,18 @@ fun MainLayout(rootNav: NavHostController, viewModel: MainViewModel, isDark: Boo
             SidebarHeader(
                 title = "Shadcn Compose",
                 icon = {
-                    Button(size = ButtonSize.Icon, onClick = {  }) {
+                    Box(
+                        modifier = Modifier.size(28.dp).background(
+                            MaterialTheme.styles.foreground,
+                            RoundedCornerShape(MaterialTheme.radius.md),
+                        ),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Icon(
                             AppIcons.Box,
                             contentDescription = "logo",
                             tint = MaterialTheme.styles.sidebarPrimaryForeground,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 },
