@@ -1,5 +1,4 @@
-rootProject.name = "ShadcnKMP"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "KomoUI"
 
 pluginManagement {
     repositories {
@@ -30,4 +29,4 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
-include(":shadcn-ui-kmp")
+include(":komoui")
