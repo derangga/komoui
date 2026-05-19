@@ -1,0 +1,139 @@
+package com.komoui.demo.pages.components
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.komoui.components.Button
+import com.komoui.components.ButtonSize
+import com.komoui.components.ButtonVariant
+import com.komoui.components.IconButton
+import com.komoui.themes.styles
+import com.komoui.demo.components.ContentPageWithTitle
+import com.komoui.demo.components.Layout
+
+@Composable
+fun ButtonPage() {
+    Layout {
+        Text(
+            "Button",
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold)
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        ContentPageWithTitle("1. Button Normal") {
+            Button(
+                onClick = { },
+            ) { Text("Normal") }
+        }
+
+        ContentPageWithTitle("2. Button Destructive") {
+            Button(
+                onClick = { },
+                variant = ButtonVariant.Destructive,
+            ) { Text("Destructive") }
+        }
+
+        ContentPageWithTitle("3. Button Secondary") {
+            Button(
+                onClick = { },
+                variant = ButtonVariant.Secondary,
+            ) { Text("Secondary") }
+        }
+
+        ContentPageWithTitle("4. Button Link") {
+            Button(
+                onClick = { },
+                variant = ButtonVariant.Link,
+            ) { Text("Link") }
+        }
+
+        ContentPageWithTitle("5. Button Ghost") {
+            Button(
+                onClick = { },
+                variant = ButtonVariant.Ghost,
+            ) { Text("Ghost") }
+        }
+
+        ContentPageWithTitle("6. Button Outline") {
+            Button(
+                onClick = { },
+                variant = ButtonVariant.Outline,
+            ) { Text("Outline") }
+        }
+
+        ContentPageWithTitle("7. Button with Loading") {
+            Button(
+                onClick = { },
+                loading = true,
+            ) {
+                Text("Please wait")
+            }
+        }
+
+        ContentPageWithTitle("8. Button Icon") {
+            Button(
+                onClick = { },
+                size = ButtonSize.Icon,
+                variant = ButtonVariant.Outline
+            ) {
+                Icon(Icons.Default.AccountCircle, contentDescription = "Icon")
+            }
+        }
+
+        ContentPageWithTitle("9. Button with Icon") {
+            Button(
+                onClick = { },
+                variant = ButtonVariant.Outline
+            ) {
+                Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Icon")
+                Spacer(Modifier.width(8.dp))
+                Text("Account")
+            }
+        }
+
+        ContentPageWithTitle("10. Button Xs Size") {
+            Button(
+                onClick = { },
+                size = ButtonSize.Xs,
+            ) { Text("Extra Small") }
+        }
+
+        ContentPageWithTitle("11. IconButton") {
+            IconButton(
+                onClick = { },
+            ) {
+                Icon(Icons.Default.Favorite, contentDescription = "Favorite")
+            }
+        }
+
+        ContentPageWithTitle("12. IconButton Small") {
+            IconButton(
+                onClick = { },
+                size = ButtonSize.IconSm,
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+        }
+
+        ContentPageWithTitle("13. Button Full Width") {
+            Button(
+                onClick = { },
+                fullWidth = true,
+            ) { Text("Full Width Button") }
+        }
+    }
+}
