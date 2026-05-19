@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-object DarkStyles : ShadcnStyles {
+object DarkStyles : KomoStyles {
     override val background: Color = Color(0xFF0A0A0A)
     override val foreground: Color = Color(0xFFFAFAFA)
     override val card: Color = Color(0xFF171717)

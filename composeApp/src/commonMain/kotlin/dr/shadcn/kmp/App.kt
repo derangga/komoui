@@ -23,7 +23,7 @@ import com.shadcn.ui.components.sooner.ObserveAsEvent
 import com.shadcn.ui.components.sooner.SonnerHost
 import com.shadcn.ui.components.sooner.SonnerProvider
 import com.shadcn.ui.components.sooner.showSonner
-import com.shadcn.ui.themes.ShadcnTheme
+import com.shadcn.ui.themes.KomoTheme
 import dr.shadcn.kmp.navigation.AppNavigation
 import dr.shadcn.kmp.themes.ThemeEvent
 import dr.shadcn.kmp.themes.ThemeObserver
@@ -46,10 +46,10 @@ fun App(
         styles = getStyles(localStyles)
     }
 
-    ShadcnTheme(
+    KomoTheme(
         isDarkTheme = isDarkMode,
-        shadcnLightColors = styles.first,
-        shadcnDarkColors = styles.second
+        komoLightColors = styles.first,
+        komoDarkColors = styles.second
     ) {
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }

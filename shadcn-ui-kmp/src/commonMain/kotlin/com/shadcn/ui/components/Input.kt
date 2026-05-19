@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 
@@ -229,7 +229,7 @@ data class InputStyle(
 )
 
 object InputDefaults {
-    private fun colorsFrom(colors: ShadcnStyles): InputStyle {
+    private fun colorsFrom(colors: KomoStyles): InputStyle {
         return InputStyle(
             background = Color.Unspecified,
             disableBackground = colors.muted,

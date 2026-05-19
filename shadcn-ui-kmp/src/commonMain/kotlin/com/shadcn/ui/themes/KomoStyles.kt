@@ -3,7 +3,7 @@ package com.shadcn.ui.themes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-interface ShadcnStyles {
+interface KomoStyles {
     val background: Color
     val foreground: Color
     val card: Color

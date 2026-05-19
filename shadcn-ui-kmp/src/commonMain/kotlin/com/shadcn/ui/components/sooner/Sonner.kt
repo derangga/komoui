@@ -24,7 +24,7 @@ import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.ButtonVariant
 import com.shadcn.ui.themes.radius
 import androidx.compose.ui.graphics.Color
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import com.shadcn.ui.themes.styles
 
 /**
@@ -140,7 +140,7 @@ private data class SonnerColors(
 
 private fun resolveSonnerColors(
     variant: SonnerVariant,
-    styles: ShadcnStyles
+    styles: KomoStyles
 ): SonnerColors = when (variant) {
     SonnerVariant.Default -> SonnerColors(
         containerColor = styles.snackbar,

@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shadcn.ui.themes.BoxShadow
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import com.shadcn.ui.themes.styles
 
-// NOTE: This file assumes the interface ShadcnStyles and BoxShadow class are declared elsewhere.
-object Claude : ShadcnStyles {
+// NOTE: This file assumes the interface KomoStyles and BoxShadow class are declared elsewhere.
+object Claude : KomoStyles {
     override val background: Color = Color(0xFFFAF9F5)
     override val foreground: Color = Color(0xFF3D3929)
     override val card: Color = Color(0xFFFAF9F5)
@@ -161,7 +161,7 @@ object Claude : ShadcnStyles {
     )
 }
 
-object ClaudeDark : ShadcnStyles {
+object ClaudeDark : KomoStyles {
     override val background: Color = Color(0xFF262624)
     override val foreground: Color = Color(0xFFC3C0B6)
     override val card: Color = Color(0xFF262624)

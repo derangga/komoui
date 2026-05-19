@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shadcn.ui.themes.BoxShadow
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import com.shadcn.ui.themes.styles
 
-// NOTE: This file assumes the interface ShadcnStyles and BoxShadow class are declared elsewhere.
-object NeoBrutalism : ShadcnStyles {
+// NOTE: This file assumes the interface KomoStyles and BoxShadow class are declared elsewhere.
+object NeoBrutalism : KomoStyles {
     override val background: Color = Color(0xFFFFFFFF)
     override val foreground: Color = Color(0xFF000000)
     override val card: Color = Color(0xFFFFFFFF)
@@ -161,7 +161,7 @@ object NeoBrutalism : ShadcnStyles {
     )
 }
 
-object NeoBrutalismDark : ShadcnStyles {
+object NeoBrutalismDark : KomoStyles {
     override val background: Color = Color(0xFF000000)
     override val foreground: Color = Color(0xFFFFFFFF)
     override val card: Color = Color(0xFF333333)

@@ -33,7 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import com.shadcn.ui.themes.radius
 import com.shadcn.ui.themes.styles
 
@@ -59,80 +59,80 @@ enum class ButtonSize {
 internal fun getButtonColors(
     variant: ButtonVariant,
     isPressed: Boolean,
-    shadcnStyles: ShadcnStyles
+    komoStyles: KomoStyles
 ): ButtonColors {
     return when (variant) {
         ButtonVariant.Default -> {
-            val containerColor = if (isPressed) shadcnStyles.primary.copy(alpha = 0.8f) else shadcnStyles.primary
+            val containerColor = if (isPressed) komoStyles.primary.copy(alpha = 0.8f) else komoStyles.primary
             val animatedContainerColor = animateColorAsState(
                 targetValue = containerColor,
                 animationSpec = tween(durationMillis = 100), label = "containerColorAnimation"
             )
             val animatedContentColor = animateColorAsState(
-                targetValue = shadcnStyles.primaryForeground,
+                targetValue = komoStyles.primaryForeground,
                 animationSpec = tween(durationMillis = 100), label = "contentColorAnimation"
             )
             ButtonDefaults.buttonColors(
                 containerColor = animatedContainerColor.value,
                 contentColor = animatedContentColor.value,
-                disabledContainerColor = shadcnStyles.primary.copy(alpha = 0.5f),
-                disabledContentColor = shadcnStyles.primaryForeground.copy(alpha = 0.5f)
+                disabledContainerColor = komoStyles.primary.copy(alpha = 0.5f),
+                disabledContentColor = komoStyles.primaryForeground.copy(alpha = 0.5f)
             )
         }
         ButtonVariant.Destructive -> {
-            val containerColor = if (isPressed) shadcnStyles.destructive.copy(alpha = 0.8f) else shadcnStyles.destructive
+            val containerColor = if (isPressed) komoStyles.destructive.copy(alpha = 0.8f) else komoStyles.destructive
             val animatedContainerColor = animateColorAsState(
                 targetValue = containerColor,
                 animationSpec = tween(durationMillis = 100), label = "containerColorAnimation"
             )
             val animatedContentColor = animateColorAsState(
-                targetValue = shadcnStyles.destructiveForeground,
+                targetValue = komoStyles.destructiveForeground,
                 animationSpec = tween(durationMillis = 100), label = "contentColorAnimation"
             )
             ButtonDefaults.buttonColors(
                 containerColor = animatedContainerColor.value,
                 contentColor = animatedContentColor.value,
-                disabledContainerColor = shadcnStyles.destructive.copy(alpha = 0.5f),
-                disabledContentColor = shadcnStyles.destructiveForeground.copy(alpha = 0.5f)
+                disabledContainerColor = komoStyles.destructive.copy(alpha = 0.5f),
+                disabledContentColor = komoStyles.destructiveForeground.copy(alpha = 0.5f)
             )
         }
         ButtonVariant.Outline -> {
-            val containerColor = if (isPressed) shadcnStyles.muted else shadcnStyles.background
+            val containerColor = if (isPressed) komoStyles.muted else komoStyles.background
             val animatedContainerColor = animateColorAsState(
                 targetValue = containerColor,
                 animationSpec = tween(durationMillis = 100), label = "containerColorAnimation"
             )
             val animatedContentColor = animateColorAsState(
-                targetValue = shadcnStyles.foreground,
+                targetValue = komoStyles.foreground,
                 animationSpec = tween(durationMillis = 100), label = "contentColorAnimation"
             )
             ButtonDefaults.outlinedButtonColors(
                 containerColor = animatedContainerColor.value,
                 contentColor = animatedContentColor.value,
                 disabledContainerColor = Color.Transparent,
-                disabledContentColor = shadcnStyles.foreground.copy(alpha = 0.5f)
+                disabledContentColor = komoStyles.foreground.copy(alpha = 0.5f)
             )
         }
         ButtonVariant.Secondary -> {
-            val containerColor = if (isPressed) shadcnStyles.secondary.copy(alpha = 0.8f) else shadcnStyles.secondary
+            val containerColor = if (isPressed) komoStyles.secondary.copy(alpha = 0.8f) else komoStyles.secondary
             val animatedContainerColor = animateColorAsState(
                 targetValue = containerColor,
                 animationSpec = tween(durationMillis = 100), label = "containerColorAnimation"
             )
             val animatedContentColor = animateColorAsState(
-                targetValue = shadcnStyles.secondaryForeground,
+                targetValue = komoStyles.secondaryForeground,
                 animationSpec = tween(durationMillis = 100), label = "contentColorAnimation"
             )
             ButtonDefaults.buttonColors(
                 containerColor = animatedContainerColor.value,
                 contentColor = animatedContentColor.value,
-                disabledContainerColor = shadcnStyles.secondary.copy(alpha = 0.5f),
-                disabledContentColor = shadcnStyles.secondaryForeground.copy(alpha = 0.5f)
+                disabledContainerColor = komoStyles.secondary.copy(alpha = 0.5f),
+                disabledContentColor = komoStyles.secondaryForeground.copy(alpha = 0.5f)
             )
         }
         ButtonVariant.Ghost -> {
-            val containerColor = if (isPressed) shadcnStyles.accent else Color.Transparent
-            val contentColor = if (isPressed) shadcnStyles.accentForeground else shadcnStyles.foreground
+            val containerColor = if (isPressed) komoStyles.accent else Color.Transparent
+            val contentColor = if (isPressed) komoStyles.accentForeground else komoStyles.foreground
             val animatedContentColor = animateColorAsState(
                 targetValue = contentColor,
                 animationSpec = tween(durationMillis = 100), label = "contentColorAnimation"
@@ -141,11 +141,11 @@ internal fun getButtonColors(
                 containerColor = containerColor,
                 contentColor = animatedContentColor.value,
                 disabledContainerColor = Color.Transparent,
-                disabledContentColor = shadcnStyles.foreground.copy(alpha = 0.5f)
+                disabledContentColor = komoStyles.foreground.copy(alpha = 0.5f)
             )
         }
         ButtonVariant.Link -> {
-            val contentColor = if (isPressed) shadcnStyles.primary.copy(alpha = 0.8f) else shadcnStyles.primary
+            val contentColor = if (isPressed) komoStyles.primary.copy(alpha = 0.8f) else komoStyles.primary
             val animatedContentColor = animateColorAsState(
                 targetValue = contentColor,
                 animationSpec = tween(durationMillis = 100), label = "contentColorAnimation"
@@ -154,7 +154,7 @@ internal fun getButtonColors(
                 containerColor = Color.Transparent,
                 contentColor = animatedContentColor.value,
                 disabledContainerColor = Color.Transparent,
-                disabledContentColor = shadcnStyles.primary.copy(alpha = 0.5f)
+                disabledContentColor = komoStyles.primary.copy(alpha = 0.5f)
             )
         }
     }

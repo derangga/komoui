@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.shadcn.ui.themes.DarkStyles
 import com.shadcn.ui.themes.LightStyles
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import dr.shadcn.kmp.themes.styles.AmberMinimal
 import dr.shadcn.kmp.themes.styles.AmberMinimalDark
 import dr.shadcn.kmp.themes.styles.BoltTech
@@ -84,7 +84,7 @@ internal fun isDarkTheme(theme: String, systemTheme: Boolean): Boolean {
     }
 }
 
-internal fun getStyles(styles: String = "Default"): Pair<ShadcnStyles, ShadcnStyles> {
+internal fun getStyles(styles: String = "Default"): Pair<KomoStyles, KomoStyles> {
     return when (styles) {
         "Bubblegum" -> Bubblegum to BubblegumDark
         "Amber Minimal" -> AmberMinimal to AmberMinimalDark

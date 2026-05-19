@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
-import com.shadcn.ui.themes.ShadcnStyles
+import com.shadcn.ui.themes.KomoStyles
 import com.shadcn.ui.themes.styles
 
 /**
@@ -112,7 +112,7 @@ fun Avatar(
 }
 
 @Composable
-private fun AvatarFallbackText(fallbackText: String, size: Dp, styles: ShadcnStyles) {
+private fun AvatarFallbackText(fallbackText: String, size: Dp, styles: KomoStyles) {
     Text(
         text = fallbackText,
         style = TextStyle(

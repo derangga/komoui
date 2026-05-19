@@ -161,7 +161,7 @@ fun TableRow(
 
 /**
  * Header cell. 40.dp minimum height, 8.dp horizontal padding, medium-weight text in
- * [com.shadcn.ui.themes.ShadcnStyles.mutedForeground]. Wrap text in [Text] for the typical case.
+ * [com.shadcn.ui.themes.KomoStyles.mutedForeground]. Wrap text in [Text] for the typical case.
  *
  * @param modifier The modifier to be applied to the cell. Pass [Modifier.width] to set the
  *      column's width — header and body cells should share the same width.
@@ -182,7 +182,7 @@ fun TableHead(
 }
 
 /**
- * Body cell. 8.dp padding, [com.shadcn.ui.themes.ShadcnStyles.foreground] text color.
+ * Body cell. 8.dp padding, [com.shadcn.ui.themes.KomoStyles.foreground] text color.
  *
  * @param modifier The modifier to be applied to the cell. Pass [Modifier.width] to set the
  *      column's width — header and body cells should share the same width.

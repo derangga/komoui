@@ -4,7 +4,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 
-interface ShadcnRadius {
+interface KomoRadius {
     val radius: Dp
     val sm: Dp
     val md: Dp
@@ -15,7 +15,7 @@ interface ShadcnRadius {
     val full: Dp
 }
 
-object Radius : ShadcnRadius {
+object Radius : KomoRadius {
     override val radius: Dp = 8.dp
     override val sm: Dp = max(0.dp, radius - 4.dp)
     override val md: Dp = max(0.dp, radius - 2.dp)

@@ -11,45 +11,45 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 
-internal val LocalShadcnStyles = staticCompositionLocalOf<ShadcnStyles> { LightStyles }
-internal val LocalShadcnRadius = staticCompositionLocalOf<ShadcnRadius> { Radius }
-internal val LocalShadcnDarkMode = staticCompositionLocalOf { false }
+internal val LocalKomoStyles = staticCompositionLocalOf<KomoStyles> { LightStyles }
+internal val LocalKomoRadius = staticCompositionLocalOf<KomoRadius> { Radius }
+internal val LocalKomoDarkMode = staticCompositionLocalOf { false }
 
 
 /**
- * Provides [ShadcnStyles] and [ShadcnRadius] through a [CompositionLocalProvider] to be used in Shadcn Compose components.
+ * Provides [KomoStyles] and [KomoRadius] through a [CompositionLocalProvider] to be used in KomoUI components.
  * It also applies MaterialTheme with the provided or default Material colors and typography.
  * notes:
  * - Use MaterialTheme.colorScheme for Material Design components.
- * - Use MaterialTheme.shadcnColors for ShadCN-specific styling.
- * - Use MaterialTheme.radius for ShadCN-specific styling.
+ * - Use MaterialTheme.styles for KomoUI-specific styling.
+ * - Use MaterialTheme.radius for KomoUI-specific styling.
  *
  * @param isDarkTheme Whether the theme should be dark or light. Defaults to the system setting.
- * @param shadcnLightColors The [ShadcnStyles] to be used for the light theme. Defaults to [LightStyles].
- * @param shadcnDarkColors The [ShadcnStyles] to be used for the dark theme. Defaults to [DarkStyles].
+ * @param komoLightColors The [KomoStyles] to be used for the light theme. Defaults to [LightStyles].
+ * @param komoDarkColors The [KomoStyles] to be used for the dark theme. Defaults to [DarkStyles].
  * @param materialLightColors The Material 3 [ColorScheme] to be used for the light theme. Defaults to [lightColorScheme].
  * @param materialDarkColors The Material 3 [ColorScheme] to be used for the dark theme. Defaults to [darkColorScheme].
- * @param shadcnRadius The [ShadcnRadius] to be used. Defaults to [Radius].
+ * @param komoRadius The [KomoRadius] to be used. Defaults to [Radius].
  * @param typography The Material 3 [Typography] to be used. Defaults to [DefaultTypography].
  * @param content The composable content to be themed.
  */
 @Composable
-fun ShadcnTheme(
+fun KomoTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
-    shadcnLightColors: ShadcnStyles = LightStyles,
-    shadcnDarkColors: ShadcnStyles = DarkStyles,
+    komoLightColors: KomoStyles = LightStyles,
+    komoDarkColors: KomoStyles = DarkStyles,
     materialLightColors: ColorScheme = lightColorScheme(),
     materialDarkColors: ColorScheme = darkColorScheme(),
-    shadcnRadius: ShadcnRadius = Radius,
+    komoRadius: KomoRadius = Radius,
     typography: Typography? = null,
     content: @Composable () -> Unit,
 ) {
-    val colors = if (isDarkTheme) shadcnDarkColors else shadcnLightColors
+    val colors = if (isDarkTheme) komoDarkColors else komoLightColors
     val materialColorScheme = if (isDarkTheme) materialDarkColors else materialLightColors
     CompositionLocalProvider(
-        LocalShadcnStyles provides colors,
-        LocalShadcnRadius provides shadcnRadius,
-        LocalShadcnDarkMode provides isDarkTheme
+        LocalKomoStyles provides colors,
+        LocalKomoRadius provides komoRadius,
+        LocalKomoDarkMode provides isDarkTheme
     ) {
         MaterialTheme(
             colorScheme = materialColorScheme,
@@ -59,17 +59,17 @@ fun ShadcnTheme(
     }
 }
 
-val MaterialTheme.styles: ShadcnStyles
+val MaterialTheme.styles: KomoStyles
     @Composable
     @ReadOnlyComposable
-    get() = LocalShadcnStyles.current
+    get() = LocalKomoStyles.current
 
-val MaterialTheme.radius: ShadcnRadius
+val MaterialTheme.radius: KomoRadius
     @Composable
     @ReadOnlyComposable
-    get() = LocalShadcnRadius.current
+    get() = LocalKomoRadius.current
 
 val MaterialTheme.isDark: Boolean
     @Composable
     @ReadOnlyComposable
-    get() = LocalShadcnDarkMode.current
+    get() = LocalKomoDarkMode.current
