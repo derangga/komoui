@@ -141,7 +141,7 @@ fun SidebarOffcanvasPage() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.styles.background)
-                    .padding(start = 8.dp, end = 8.dp, top = 28.dp),
+                    .padding(horizontal = 8.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

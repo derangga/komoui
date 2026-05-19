@@ -293,16 +293,21 @@ private fun SidebarInsetShell(
         Modifier.background(styles.background)
     }
 
-    // We rely on the parent (Row on desktop) to give us our weight; in mobile we just fill.
-    // systemBars padding keeps the inset card / content inside the safe area;
-    // for the inset variant, the provider's wrapper background extends behind the system bars.
-     val statusBarsModifier = if (isInset) Modifier.windowInsetsPadding(WindowInsets.systemBars) else Modifier
+    // System-bar handling differs by variant:
+    //  - Inset: padding is applied BEFORE the card so the rounded/shadowed card sits inside the
+    //    safe area; the provider's `styles.sidebar` wrapper paints behind the bars.
+    //  - Sidebar / Floating / mobile: padding is applied AFTER the background so the inset
+    //    background still bleeds edge-to-edge while `content()` stays inside the safe area.
+    val insetsModifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
+    val insetsBeforeCard = if (isInset) insetsModifier else Modifier
+    val insetsAfterCard = if (isInset) Modifier else insetsModifier
 
     Box(
         modifier = (if (isMobile) Modifier.fillMaxSize() else Modifier.fillMaxHeight())
-            .then(statusBarsModifier)
+            .then(insetsBeforeCard)
             .then(outerPadding)
             .then(cardModifier)
+            .then(insetsAfterCard)
             .then(modifier),
         content = content,
     )
