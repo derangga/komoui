@@ -23,3 +23,8 @@ captures
 .dolt/
 *.db
 .beads-credential-key
+
+# Nix
+result
+result-*
+.direnv/
