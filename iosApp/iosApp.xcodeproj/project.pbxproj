@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		CEF0BEA18E4BA4A3939F2E13 /* Shadcn KMP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Shadcn KMP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEF0BEA18E4BA4A3939F2E13 /* KomoUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KomoUI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -59,7 +59,7 @@
 		EA50CB84235DF9A22B69725A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CEF0BEA18E4BA4A3939F2E13 /* Shadcn KMP.app */,
+				CEF0BEA18E4BA4A3939F2E13 /* KomoUI.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,7 +87,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = CEF0BEA18E4BA4A3939F2E13 /* Shadcn KMP.app */;
+			productReference = CEF0BEA18E4BA4A3939F2E13 /* KomoUI.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

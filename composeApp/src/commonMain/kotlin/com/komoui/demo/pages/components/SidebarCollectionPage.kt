@@ -41,7 +41,7 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
                         id = "item-1",
                         header = { Text("Details") },
                         content = {
-                            Text("The standard sidebar mirrors shadcn/ui: place Sidebar and SidebarInset as siblings inside SidebarProvider. On desktop they render as a Row; on mobile (viewport < 768.dp) SidebarProvider hosts them inside a Material3 ModalNavigationDrawer. This demo uses collapsible = Icon so the sidebar can collapse to an icon rail with tooltips.")
+                            Text("The standard sidebar places Sidebar and SidebarInset as siblings inside SidebarProvider. On desktop they render as a Row; on mobile (viewport < 768.dp) SidebarProvider hosts them inside a Material3 ModalNavigationDrawer. This demo uses collapsible = Icon so the sidebar can collapse to an icon rail with tooltips.")
                         }
                     )
                 )

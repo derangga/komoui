@@ -95,7 +95,7 @@ fun SidebarLayoutPage() {
                 AppSidebarMenu(sidebarNav, selectedItem) { selectedItem = it }
             }
             SidebarFooter {
-                NavUser(name = "shadcn", email = "m@example.com")
+                NavUser(name = "demo", email = "m@example.com")
             }
         }
         SidebarInset {

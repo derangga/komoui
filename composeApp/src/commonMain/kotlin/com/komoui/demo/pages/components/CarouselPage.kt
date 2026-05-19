@@ -17,13 +17,13 @@ import com.komoui.components.Carousel
 import com.komoui.demo.components.ContentPageWithTitle
 import com.komoui.demo.components.Layout
 import org.jetbrains.compose.resources.painterResource
-import shadcnkmp.composeapp.generated.resources.Res
-import shadcnkmp.composeapp.generated.resources.store_1
-import shadcnkmp.composeapp.generated.resources.store_2
-import shadcnkmp.composeapp.generated.resources.store_3
-import shadcnkmp.composeapp.generated.resources.store_h_1
-import shadcnkmp.composeapp.generated.resources.store_h_2
-import shadcnkmp.composeapp.generated.resources.store_h_3
+import komoui.composeapp.generated.resources.Res
+import komoui.composeapp.generated.resources.store_1
+import komoui.composeapp.generated.resources.store_2
+import komoui.composeapp.generated.resources.store_3
+import komoui.composeapp.generated.resources.store_h_1
+import komoui.composeapp.generated.resources.store_h_2
+import komoui.composeapp.generated.resources.store_h_3
 
 @Composable
 fun CarouselPage() {

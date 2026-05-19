@@ -125,7 +125,7 @@ fun MainLayout(rootNav: NavHostController, viewModel: MainViewModel, isDark: Boo
     ) {
         Sidebar {
             SidebarHeader(
-                title = "Shadcn Compose",
+                title = "KomoUI",
                 icon = {
                     Box(
                         modifier = Modifier.size(28.dp).background(
@@ -144,7 +144,7 @@ fun MainLayout(rootNav: NavHostController, viewModel: MainViewModel, isDark: Boo
                 },
             )
             AppSidebarContent(sidebarNav = childNav, selectedMenu = selectedMenu) { selectedMenu = it }
-            SidebarFooter(text = "© 2025 Shadcn Compose")
+            SidebarFooter(text = "© 2025 KomoUI")
         }
         SidebarInset {
             Scaffold(

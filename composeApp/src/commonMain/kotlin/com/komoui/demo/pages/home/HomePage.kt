@@ -50,7 +50,7 @@ fun HomePage(parentNav: NavHostController) {
                 lineHeight = 32.sp
             )
             Text(
-                "shadcn-compose is inspired by shadcn, providing beautifully designed components that you can copy and paste into your apps. Accessible, customizable, and open source.",
+                "KomoUI is a Compose Multiplatform UI library providing beautifully designed components you can drop into your Android and iOS apps. Accessible, customizable, and open source.",
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))

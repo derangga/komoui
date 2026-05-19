@@ -134,7 +134,7 @@ fun SidebarOffcanvasPage() {
                     }
                 }
             }
-            SidebarFooter(text = "© 2025 Shadcn Compose")
+            SidebarFooter(text = "© 2025 KomoUI")
         }
         SidebarInset {
             Column(
