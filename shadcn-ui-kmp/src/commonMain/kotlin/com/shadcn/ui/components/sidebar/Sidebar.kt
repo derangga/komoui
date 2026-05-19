@@ -186,26 +186,28 @@ private fun DesktopFloatingSidebar(
         animationSpec = state.animationSpec,
         label = "sidebar-floating-width",
     )
+    val shadow = MaterialTheme.styles.shadow()
+    val shape = RoundedCornerShape(MaterialTheme.radius.lg)
 
     Box(
         modifier = modifier
             .fillMaxHeight()
             .width(animatedWidth)
+            .background(MaterialTheme.styles.background)
             // Floating variant: the system bars sit outside the floating card.
             .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(8.dp),
+            .padding(vertical = 0.dp, horizontal = 8.dp),
     ) {
         Column(
             modifier = Modifier
+                .drawShadows(MaterialTheme.radius.xl, shadow)
                 .fillMaxSize()
-                .background(
-                    color = styles.sidebar,
-                    shape = RoundedCornerShape(MaterialTheme.radius.lg),
-                )
+                .clip(shape)
+                .background(color = styles.sidebar, shape = shape)
                 .border(
                     width = 1.dp,
                     color = styles.sidebarBorder,
-                    shape = RoundedCornerShape(MaterialTheme.radius.lg),
+                    shape = shape,
                 ),
             horizontalAlignment = if (state.isCollapsedIcon) Alignment.CenterHorizontally else Alignment.Start,
             content = content,
@@ -266,16 +268,16 @@ private fun SidebarInsetShell(
         state.side == SidebarSide.Left -> {
             // Match React: m-2, ml-0; when collapsed-to-icon, restore ml-2.
             if (state.isCollapsedIcon) {
-                Modifier.padding(8.dp)
-            } else {
                 Modifier.padding(start = 0.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
+            } else {
+                Modifier.padding(8.dp)
             }
         }
         else -> { // Right
             if (state.isCollapsedIcon) {
-                Modifier.padding(8.dp)
-            } else {
                 Modifier.padding(start = 8.dp, top = 8.dp, end = 0.dp, bottom = 8.dp)
+            } else {
+                Modifier.padding(8.dp)
             }
         }
     }
