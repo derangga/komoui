@@ -1,5 +1,4 @@
-rootProject.name = "komoui"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "KomoUI"
 
 pluginManagement {
     repositories {
