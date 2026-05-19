@@ -29,7 +29,7 @@ import com.komoui.themes.styles
 import androidx.compose.ui.window.Dialog as ComposeDialog
 
 /**
- * A Jetpack Compose Dialog component inspired by Shadcn UI.
+ * A Jetpack Compose Dialog component for KomoUI.
  * Displays a modal dialog with a title, description, and customizable footer.
  *
  * @param onDismissRequest Callback invoked when the user tries
@@ -153,7 +153,7 @@ fun DialogDescription(
 }
 
 /**
- * Composable for an action button within a ShadcnDialog's `footer` slot.
+ * Composable for an action button within a Dialog's `footer` slot.
  * Typically used for the primary action (e.g., "Save changes").
  * Uses [Button] with `ButtonVariant.Default`.
  */
@@ -169,7 +169,7 @@ fun DialogAction(
 }
 
 /**
- * Composable for a cancel button within a ShadcnDialog's `footer` slot.
+ * Composable for a cancel button within a Dialog's `footer` slot.
  * Typically used for a secondary action (e.g., "Cancel").
  * Uses [Button] with `ButtonVariant.Outline`.
  */

@@ -1,8 +1,8 @@
 # Sidebar
 
-A composable, themeable sidebar inspired by the [shadcn/ui](https://ui.shadcn.com/docs/components/sidebar) component, ported to Compose Multiplatform.
+A composable, themeable sidebar for Compose Multiplatform.
 
-The API mirrors the React component one-to-one, so any shadcn recipe translates directly: `Sidebar` and `SidebarInset` are placed as **siblings inside `SidebarProvider`**, and the provider arranges them as a `Row` on desktop or as a `ModalNavigationDrawer` on mobile (viewport < `SidebarDefaults.MobileBreakpoint`, default 768.dp).
+`Sidebar` and `SidebarInset` are placed as **siblings inside `SidebarProvider`**, and the provider arranges them as a `Row` on desktop or as a `ModalNavigationDrawer` on mobile (viewport < `SidebarDefaults.MobileBreakpoint`, default 768.dp).
 
 ## Quick start
 
@@ -40,7 +40,7 @@ SidebarProvider(
                 }
             }
         }
-        // Text-only footer disappears in icon mode (matches shadcn).
+        // Text-only footer disappears in icon mode.
         SidebarFooter(text = "v1.0.0")
         SidebarRail() // optional: thin clickable outer-edge rail
     }
@@ -70,7 +70,7 @@ var open by rememberSaveable { mutableStateOf(true) }
 SidebarProvider(open = open, onOpenChange = { open = it }) { /* ... */ }
 ```
 
-Mobile open state is always uncontrolled and session-scoped (matches React behavior).
+Mobile open state is always uncontrolled and session-scoped.
 
 ## Variants
 
@@ -98,7 +98,7 @@ When `Icon` is active and the sidebar is closed:
 
 - Labels, badges, sub-menus, group labels, group actions hide.
 - `SidebarMenuButton(tooltip = ...)` activates a Material3 `PlainTooltip` on long-press / hover.
-- `SidebarMenuSub` disappears entirely (matches React).
+- `SidebarMenuSub` disappears entirely.
 - The text-overload of `SidebarHeader` / `SidebarFooter` reduces to the icon (or hides entirely if no icon is provided).
 
 ## System bars / safe area
@@ -163,10 +163,10 @@ SidebarHeader(
 ### Footer with copyright (hidden in icon mode)
 
 ```kotlin
-SidebarFooter(text = "© 2025 Shadcn Compose")
+SidebarFooter(text = "© 2025 KomoUI")
 ```
 
-### Footer with NavUser (avatar + name/email, like shadcn's `NavUser`)
+### Footer with NavUser (avatar + name/email)
 
 The icon slot of `SidebarMenuButton` no longer clamps its size, so an `Avatar` renders at its natural size beside the name/email column. When the sidebar collapses to icon mode, the menu button reduces to just the avatar.
 
@@ -177,18 +177,18 @@ SidebarFooter {
             SidebarMenuButton(
                 onClick = { /* ... */ },
                 size = SidebarMenuButtonSize.Large,
-                tooltip = "shadcn",
+                tooltip = "Jane Doe",
                 icon = {
                     Avatar(
                         model = null,
                         size = 32.dp,
-                        fallbackText = "SH",
+                        fallbackText = "JD",
                     )
                 },
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("shadcn", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                    Text("m@example.com", fontSize = 12.sp,
+                    Text("Jane Doe", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Text("jane@example.com", fontSize = 12.sp,
                          color = MaterialTheme.styles.mutedForeground)
                 }
                 Icon(Icons.Default.UnfoldMore, contentDescription = "Open user menu",

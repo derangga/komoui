@@ -43,7 +43,7 @@ enum class CarouselOrientation {
 }
 
 /**
- * A Jetpack Compose Carousel component inspired by Shadcn UI, utilizing HorizontalPager/VerticalPager for snapping behavior.
+ * A Jetpack Compose Carousel component for KomoUI, utilizing HorizontalPager/VerticalPager for snapping behavior.
  *
  * @param containerModifier The modifier to be applied to the outer carousel container (Column).
  * @param modifier The modifier to be applied to the pager.

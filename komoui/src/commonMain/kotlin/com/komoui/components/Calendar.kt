@@ -232,7 +232,7 @@ private fun DayOfWeek.toSundayStartIndex(): Int = when (this) {
 }
 
 /**
- * A Jetpack Compose Calendar component inspired by Shadcn UI.
+ * A Jetpack Compose Calendar component for KomoUI.
  * Backward-compatible overload that wraps single date selection into [CalendarSelectionMode.Single].
  *
  * @param modifier The modifier to be applied to the calendar container.
@@ -264,7 +264,7 @@ fun Calendar(
 }
 
 /**
- * A Jetpack Compose Calendar component inspired by Shadcn UI.
+ * A Jetpack Compose Calendar component for KomoUI.
  * Supports single date selection and range date selection via [CalendarSelectionMode].
  *
  * @param modifier The modifier to be applied to the calendar container.

@@ -47,7 +47,7 @@ import com.komoui.themes.styles
 
 /**
  * Root Table primitive. Wraps content in a horizontally scrollable container with a rounded
- * border, mirroring shadcn `<Table>`. Children are typically [TableHeader], [TableBody],
+ * border. Children are typically [TableHeader], [TableBody],
  * [TableFooter], and an optional [TableCaption] outside the scroll container.
  *
  * On mobile, the table is intentionally not shrunk to viewport — set explicit widths on cells
@@ -88,7 +88,7 @@ fun TableHeader(
 
 /**
  * Body section of a [Table]. Stack [TableRow]s vertically. The last row should pass
- * `showBottomBorder = false` to mimic shadcn `[&_tr:last-child]:border-0`.
+ * `showBottomBorder = false`.
  */
 @Composable
 fun TableBody(
@@ -99,7 +99,7 @@ fun TableBody(
 }
 
 /**
- * Footer section of a [Table]. Renders a muted background and a top border, matching shadcn
+ * Footer section of a [Table]. Renders a muted background and a top border, matching
  * `<TableFooter>`.
  */
 @Composable
@@ -312,7 +312,7 @@ fun PaginationScope.DefaultPagination() {
 }
 
 /**
- * A typed Data Table inspired by shadcn's data-table demo. Provides sorting, optional row
+ * A typed Data Table. Provides sorting, optional row
  * selection, and Previous/Next pagination. State is owned by the component; pass [onSortChange]
  * and [onSelectionChange] to observe.
  *

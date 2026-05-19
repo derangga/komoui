@@ -66,7 +66,7 @@ class DateFormatter(private val pattern: String) {
 }
 
 /**
- * A Jetpack Compose Date Picker component inspired by Shadcn UI.
+ * A Jetpack Compose Date Picker component for KomoUI.
  * It combines a clickable input field with a popover containing a calendar.
  *
  * @param modifier The modifier to be applied to the date picker container.
@@ -187,7 +187,7 @@ fun DatePicker(
 }
 
 /**
- * A Jetpack Compose Date Range Picker component inspired by Shadcn UI.
+ * A Jetpack Compose Date Range Picker component for KomoUI.
  * It combines a clickable input field with a popover containing a range-selection calendar.
  *
  * @param modifier The modifier to be applied to the date range picker container.

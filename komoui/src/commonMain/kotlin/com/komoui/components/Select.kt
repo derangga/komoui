@@ -56,7 +56,7 @@ import com.komoui.themes.styles
 import kotlin.math.roundToInt
 
 /**
- * A Jetpack Compose Select component inspired by Shadcn UI.
+ * A Jetpack Compose Select component for KomoUI.
  * Provides a dropdown list for selecting an option, appearing as a popover.
  *
  * This generic overload allows selecting from a list of any type [T].
@@ -230,7 +230,7 @@ fun <T> Select(
 }
 
 /**
- * A Jetpack Compose Select component inspired by Shadcn UI.
+ * A Jetpack Compose Select component for KomoUI.
  * Provides a dropdown list for selecting a string option, appearing as a popover.
  *
  * This is a convenience overload for [List] of [String] options.

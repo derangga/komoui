@@ -85,7 +85,7 @@ object InputOTPDefaults {
 }
 
 /**
- * A Jetpack Compose Input OTP component inspired by Shadcn UI.
+ * A Jetpack Compose Input OTP component for KomoUI.
  * Renders [length] character slots backed by a single hidden text field.
  *
  * @param value The current OTP value.

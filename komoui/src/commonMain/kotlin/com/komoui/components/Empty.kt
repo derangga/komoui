@@ -32,7 +32,7 @@ enum class EmptyMediaVariant {
 }
 
 /**
- * Container for an empty state, inspired by shadcn/ui's Empty component.
+ * Container for an empty state, for KomoUI's Empty component.
  * Lays out its children in a centered column with consistent spacing.
  *
  * @param modifier The modifier to be applied to the container.

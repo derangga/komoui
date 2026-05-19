@@ -161,7 +161,7 @@ internal fun getButtonColors(
 }
 
 /**
- * A composable button component inspired by shadcn/ui.
+ * A composable button component for KomoUI.
  *
  * @param onClick Lambda function to be invoked when the button is clicked.
  * @param modifier Modifier to be applied to the button.

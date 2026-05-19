@@ -140,7 +140,7 @@ fun TabsTrigger(
 }
 
 /**
- * Shadcn-style TabsContent component
+ * KomoUI-style TabsContent component
  */
 @Composable
 fun TabsContent(

@@ -25,13 +25,13 @@ import com.komoui.themes.radius
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Skeleton component inspired by Shadcn UI.
+ * A Jetpack Compose Skeleton component for KomoUI.
  * Displays a placeholder loading state with a shimmer effect.
  *
  * @param modifier The modifier to be applied to the skeleton container.
  * @param shape The shape of the skeleton. Defaults to `RoundedCornerShape(Radius.md)`.
- * @param baseColor The base background color of the skeleton. Defaults to `MaterialTheme.shadcnColors.muted`.
- * @param shimmerColor The color of the shimmering highlight. Defaults to `MaterialTheme.shadcnColors.background.copy(alpha = 0.8f)`.
+ * @param baseColor The base background color of the skeleton. Defaults to `MaterialTheme.styles.muted`.
+ * @param shimmerColor The color of the shimmering highlight. Defaults to `MaterialTheme.styles.background.copy(alpha = 0.8f)`.
  * @param animationDurationMillis The duration of one shimmer cycle in milliseconds.
  * @param gradientWidthRatio The ratio of the shimmer gradient's width to the skeleton's width.
  */

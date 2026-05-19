@@ -28,7 +28,7 @@ import com.komoui.themes.radius
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Card component inspired by Shadcn UI.
+ * A Jetpack Compose Card component for KomoUI.
  * This is the main container for a card.
  *
  * @param modifier The modifier to be applied to the card container.
@@ -158,7 +158,7 @@ fun CardContent(
 
 /**
  * Composable for the footer section of a Card.
- * Uses a horizontal [Row] layout, matching shadcn/ui's footer behavior.
+ * Uses a horizontal [Row] layout,
  *
  * @param modifier The modifier to be applied to the footer.
  * @param horizontalArrangement The horizontal arrangement of the footer content.

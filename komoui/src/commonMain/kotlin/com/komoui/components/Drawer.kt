@@ -39,7 +39,7 @@ import com.komoui.themes.radius
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Drawer (Bottom Sheet) component inspired by Shadcn UI.
+ * A Jetpack Compose Drawer (Bottom Sheet) component for KomoUI.
  * Displays a modal bottom sheet with a title, description, and customizable footer.
  *
  * @param onDismissRequest Callback invoked when the user tries to dismiss the drawer (e.g., by swiping down or tapping outside).
@@ -74,7 +74,7 @@ fun Drawer(
             contentColor = styles.foreground,
             shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
             dragHandle = {
-                // Custom drag handle to match Shadcn's aesthetic, which is often a simple line
+                // Custom drag handle with a minimal aesthetic, which is often a simple line
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -202,7 +202,7 @@ fun Drawer(
 }
 
 /**
- * Composable for the title of a ShadcnDrawer.
+ * Composable for the title of a Drawer.
  * This should be used within the `title` slot of [Drawer].
  */
 @Composable
@@ -216,7 +216,7 @@ fun DrawerTitle(
 }
 
 /**
- * Composable for the description of a ShadcnDrawer.
+ * Composable for the description of a Drawer.
  * This should be used within the `description` slot of [Drawer].
  */
 @Composable
@@ -230,7 +230,7 @@ fun DrawerDescription(
 }
 
 /**
- * Composable for an action button within a ShadcnDrawer's `footer` slot.
+ * Composable for an action button within a Drawer's `footer` slot.
  * Typically used for the primary action (e.g., "Save changes").
  * Uses [Button] with `ButtonVariant.Default`.
  */
@@ -246,7 +246,7 @@ fun DrawerAction(
 }
 
 /**
- * Composable for a cancel button within a ShadcnDrawer's `footer` slot.
+ * Composable for a cancel button within a Drawer's `footer` slot.
  * Typically used for a secondary action (e.g., "Cancel").
  * Uses [Button] with `ButtonVariant.Outline`.
  */

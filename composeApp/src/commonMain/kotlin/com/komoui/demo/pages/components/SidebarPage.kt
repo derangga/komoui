@@ -238,7 +238,7 @@ private fun AppSidebarMenu(
 }
 
 /**
- * NavUser footer — mirrors shadcn's `NavUser` from dashboard-01/app-sidebar.tsx.
+ * NavUser footer — renders an avatar with name + email and a chevron.
  *
  * Renders an avatar + name/email + chevron inside a Large [SidebarMenuButton]. Since
  * the menu button collapses to icon-only in icon mode, the footer naturally reduces to

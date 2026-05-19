@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Radio Group component inspired by Shadcn UI.
+ * A Jetpack Compose Radio Group component for KomoUI.
  * It manages the selection state for a group of [RadioButtonWithLabel]s.
  *
  * @param selectedValue The currently selected value in the group.
@@ -68,7 +68,7 @@ enum class LayoutOrientation {
 
 /**
  * A convenience composable to combine a native [RadioButton] with a [Text] label,
- * styled to match Shadcn UI. This should be used as a child within a [RadioGroup].
+ * with the KomoUI design tokens. This should be used as a child within a [RadioGroup].
  *
  * @param value The value associated with this radio button.
  * @param label The text label for this radio button.

@@ -452,7 +452,7 @@ fun SidebarFooter(
  * (e.g. a copyright line or username) alongside an optional [icon] when expanded, and
  * collapses to icon-only — or hides entirely when no icon is provided — in icon mode.
  *
- * Matches shadcn/ui's behavior, where text-only footer content disappears in icon mode and
+ * Text-only footer content disappears in icon mode and
  * avatar + text patterns reduce to just the avatar. For richer footer content (dropdowns,
  * user menus), use the slot overload with [SidebarMenu] / [SidebarMenuButton] inside, which
  * already adapt to icon mode.

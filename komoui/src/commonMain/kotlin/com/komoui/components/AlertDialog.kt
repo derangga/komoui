@@ -119,7 +119,7 @@ fun AlertDialogDescription(
 }
 
 /**
- * Composable for an action button within a ShadcnAlertDialog's `actions` slot.
+ * Composable for an action button within a AlertDialog's `actions` slot.
  * Typically used for the primary action (e.g., "Continue", "Confirm").
  * Uses [Button] with `ButtonVariant.Default`.
  */
@@ -135,7 +135,7 @@ fun AlertDialogAction(
 }
 
 /**
- * Composable for a cancel button within a ShadcnAlertDialog's `actions` slot.
+ * Composable for a cancel button within a AlertDialog's `actions` slot.
  * Typically used for a secondary action (e.g., "Cancel").
  * Uses [Button] with `ButtonVariant.Outline`.
  */

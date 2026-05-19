@@ -27,7 +27,7 @@ import com.komoui.themes.radius
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Checkbox component inspired by Shadcn UI.
+ * A Jetpack Compose Checkbox component for KomoUI.
  *
  * @param checked Whether this checkbox is checked.
  * @param onCheckedChange Callback to be invoked when the checkbox's checked state changes.
@@ -147,7 +147,7 @@ data class CheckboxColors(
  */
 object CheckboxDefaults {
     /**
-     * Creates a [CheckboxColors] with the default shadcn-style color scheme.
+     * Creates a [CheckboxColors] with the default KomoUI color scheme.
      *
      * @return A [CheckboxColors] instance using the current theme's color palette.
      */

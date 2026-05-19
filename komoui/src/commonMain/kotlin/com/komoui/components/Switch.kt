@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Switch component inspired by Shadcn UI.
+ * A Jetpack Compose Switch component for KomoUI.
  * Provides a toggle switch for boolean states.
  *
  * @param checked Whether this switch is checked.

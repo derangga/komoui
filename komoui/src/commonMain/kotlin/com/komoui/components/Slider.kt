@@ -21,7 +21,7 @@ import com.komoui.themes.radius
 import com.komoui.themes.styles
 
 /**
- * A Jetpack Compose Slider component inspired by Shadcn UI.
+ * A Jetpack Compose Slider component for KomoUI.
  * Allows users to select a value from a continuous range.
  *
  * @param value The current value of the slider.

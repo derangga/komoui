@@ -38,7 +38,7 @@ import com.komoui.themes.styles
 // --- 3. Dropdown Menu Components ---
 
 /**
- * A Jetpack Compose Dropdown Menu component inspired by Shadcn UI.
+ * A Jetpack Compose Dropdown Menu component for KomoUI.
  * Displays a popover menu when triggered.
  *
  * @param expanded Boolean state controlling the visibility of the dropdown menu.
@@ -80,7 +80,7 @@ fun DropdownMenu(
 }
 
 /**
- * A styled menu item for ShadcnDropdownMenu.
+ * A styled menu item for DropdownMenu.
  *
  * @param onClick Callback invoked when the item is clicked.
  * @param modifier The modifier to be applied to the menu item.
@@ -145,7 +145,7 @@ fun DropdownMenuItem(
 }
 
 /**
- * A styled separator for ShadcnDropdownMenu.
+ * A styled separator for DropdownMenu.
  *
  * @param modifier The modifier to be applied to the separator.
  */

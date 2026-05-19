@@ -28,7 +28,7 @@ import com.komoui.themes.styles
 import kotlin.math.roundToInt
 
 /**
- * A Jetpack Compose Popover component inspired by Shadcn UI.
+ * A Jetpack Compose Popover component for KomoUI.
  * Displays a floating panel of content (popover) when triggered.
  *
  * @param open Boolean state controlling the visibility of the popover.

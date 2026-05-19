@@ -55,7 +55,7 @@ import com.komoui.themes.styles
 import kotlin.math.roundToInt
 
 /**
- * A Jetpack Compose Combobox component inspired by Shadcn UI's Dropdown Menu.
+ * A Jetpack Compose Combobox component for KomoUI's Dropdown Menu.
  * Provides a searchable dropdown list for selecting an option, appearing as a popover.
  *
  * @param options The list of string options to display in the combobox.

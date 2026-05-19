@@ -45,8 +45,8 @@ enum class InputVariant {
 }
 
 /**
- * A Jetpack Compose Input component inspired by Shadcn UI.
- * Provides a customizable text input field with Shadcn styling.
+ * A Jetpack Compose Input component for KomoUI.
+ * Provides a customizable text input field with KomoUI styling.
  *
  * @param value The current text value of the input field.
  * @param onValueChange Callback invoked when the text in the input field changes.

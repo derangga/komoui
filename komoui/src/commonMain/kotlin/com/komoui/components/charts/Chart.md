@@ -2,7 +2,7 @@
 
 Hand-rolled Compose Multiplatform chart primitives in `commonMain` (Android + iOS). No external charting lib. All shared logic lives in `ChartCommon.kt` next to this file.
 
-Public charts: `BarChart`, `LineChart`, `AreaChart`. Demo lives at `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/pages/components/ChartPage.kt`.
+Public charts: `BarChart`, `LineChart`, `AreaChart`. Demo lives at `composeApp/src/commonMain/kotlin/com/komoui/demo/pages/components/ChartPage.kt`.
 
 ## Pitfalls — read first
 
@@ -149,18 +149,18 @@ Worked example: `ScatterChart`. Same shape applies to `PieChart`, `RadarChart`, 
 
 9. **Wire the demo:**
    - Add a section to `ChartPage.kt` with `ContentPageWithTitle("N. Scatter chart") { ScatterChart(...) }`.
-   - Pull colors from `MaterialTheme.styles.chart1..chart5` (already defined in `ShadcnStyles.kt`).
+   - Pull colors from `MaterialTheme.styles.chart1..chart5` (already defined in `KomoStyles.kt`).
 
 10. **Verify on both targets:**
     ```bash
-    ./gradlew :shadcn-ui-kmp:compileCommonMainKotlinMetadata
+    ./gradlew :komoui:compileCommonMainKotlinMetadata
     ./gradlew :composeApp:compileDebugKotlinAndroid
-    ./gradlew :shadcn-ui-kmp:compileKotlinIosSimulatorArm64    # slow first run
+    ./gradlew :komoui:compileKotlinIosSimulatorArm64    # slow first run
     ```
 
 ## Files at a glance
 
 - `ChartCommon.kt` — types, helpers, drawing primitives
 - `BarChart.kt` / `LineChart.kt` / `AreaChart.kt` — public charts
-- `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/pages/components/ChartPage.kt` — demo
-- `composeApp/src/commonMain/kotlin/dr/shadcn/kmp/{Route.kt,HomeContent.kt,navigation/MainNavigation.kt}` — demo route wiring (Chart route already exists; only add new demo sections, no new route needed for chart variants)
+- `composeApp/src/commonMain/kotlin/com/komoui/demo/pages/components/ChartPage.kt` — demo
+- `composeApp/src/commonMain/kotlin/com/komoui/demo/{Route.kt,HomeContent.kt,navigation/MainNavigation.kt}` — demo route wiring (Chart route already exists; only add new demo sections, no new route needed for chart variants)
