@@ -22,11 +22,19 @@ BUILD_FILE="komoui/build.gradle.kts"
 sed -i '' "s/version = \"[^\"]*\"/version = \"$VERSION\"/" "$BUILD_FILE"
 echo "Updated $BUILD_FILE to version $VERSION"
 
-# Commit
-git add "$BUILD_FILE"
-git commit -m "release: new version $VERSION"
+# Commit only if the version actually changed.
+if git diff --quiet "$BUILD_FILE"; then
+  echo "Version already at $VERSION in $BUILD_FILE — skipping commit."
+else
+  git add "$BUILD_FILE"
+  git commit -m "release: new version $VERSION"
+fi
 
-# Create tag
+# Create tag (refuse if it already exists locally to avoid silent overwrites).
+if git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; then
+  echo "Error: tag $VERSION already exists locally. Delete it first if you intend to re-tag."
+  exit 1
+fi
 git tag "$VERSION"
 
 # Prompt to push
