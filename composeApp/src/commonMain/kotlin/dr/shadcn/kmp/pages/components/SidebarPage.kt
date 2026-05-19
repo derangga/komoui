@@ -35,8 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shadcn.ui.components.Avatar
-import com.shadcn.ui.components.Button
-import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.sidebar.Sidebar
 import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
@@ -54,7 +52,6 @@ import com.shadcn.ui.components.sidebar.SidebarMenuItem
 import com.shadcn.ui.components.sidebar.SidebarMenuSub
 import com.shadcn.ui.components.sidebar.SidebarMenuSubButton
 import com.shadcn.ui.components.sidebar.SidebarProvider
-import com.shadcn.ui.components.sidebar.SidebarRail
 import com.shadcn.ui.components.sidebar.SidebarSeparator
 import com.shadcn.ui.components.sidebar.SidebarTrigger
 import com.shadcn.ui.components.sidebar.SidebarVariant
@@ -106,7 +103,7 @@ fun SidebarLayoutPage() {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.styles.background)
-                    .padding(16.dp),
+                    .padding(start = 8.dp, end = 8.dp, top = 28.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

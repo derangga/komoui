@@ -69,7 +69,7 @@ fun SidebarInsetPage() {
     SidebarProvider(
         defaultOpen = false,
         variant = SidebarVariant.Inset,
-        collapsible = SidebarCollapsible.Offcanvas,
+        collapsible = SidebarCollapsible.Icon,
     ) {
         Sidebar {
             SidebarHeader(
@@ -160,8 +160,7 @@ fun SidebarInsetPage() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.styles.background)
-                    .padding(16.dp),
+                    .padding(horizontal = 8.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

@@ -268,16 +268,16 @@ private fun SidebarInsetShell(
         state.side == SidebarSide.Left -> {
             // Match React: m-2, ml-0; when collapsed-to-icon, restore ml-2.
             if (state.isCollapsedIcon) {
-                Modifier.padding(start = 0.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
+                Modifier.padding(start = 0.dp, end = 8.dp)
             } else {
-                Modifier.padding(8.dp)
+                Modifier.padding(horizontal = 8.dp)
             }
         }
         else -> { // Right
             if (state.isCollapsedIcon) {
-                Modifier.padding(start = 8.dp, top = 8.dp, end = 0.dp, bottom = 8.dp)
+                Modifier.padding(start = 8.dp, end = 0.dp)
             } else {
-                Modifier.padding(8.dp)
+                Modifier.padding(horizontal = 8.dp)
             }
         }
     }
