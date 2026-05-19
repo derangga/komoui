@@ -77,7 +77,29 @@ fun SidebarCollectionPage(parentNav: NavHostController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text("3. Offcanvas sidebar (collapsible = Offcanvas)")
+        Text("3. Floating sidebar (variant = Floating)")
+        Accordion(
+            items =
+                listOf(
+                    AccordionItemData(
+                        id = "item-1",
+                        header = { Text("Details") },
+                        content = {
+                            Text("The floating variant wraps the sidebar in a padded outer container that renders as a rounded, bordered card detached from the screen edge. SidebarInset behaves the same as the standard variant.")
+                        }
+                    )
+                )
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        ContentPageWithTitle {
+            Button(
+                onClick = { parentNav.navigate(TopLevelRoute.SidebarFloatingGraph.path) }
+            ) { Text("Open floating sidebar demo") }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("4. Offcanvas sidebar (collapsible = Offcanvas)")
         Accordion(
             items =
                 listOf(

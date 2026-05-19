@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import dr.shadcn.kmp.TopLevelRoute
 import dr.shadcn.kmp.pages.MainLayout
 import dr.shadcn.kmp.pages.MainViewModel
+import dr.shadcn.kmp.pages.components.SidebarFloatingPage
 import dr.shadcn.kmp.pages.components.SidebarInsetPage
 import dr.shadcn.kmp.pages.components.SidebarLayoutPage
 import dr.shadcn.kmp.pages.components.SidebarOffcanvasPage
@@ -54,6 +55,10 @@ fun AppNavigation(
 
         composable(TopLevelRoute.SidebarOffcanvasGraph.path) {
             SidebarOffcanvasPage()
+        }
+
+        composable(TopLevelRoute.SidebarFloatingGraph.path) {
+            SidebarFloatingPage()
         }
 
 //        composable(TopLevelRoute.WebviewGraph.path) { backstack ->

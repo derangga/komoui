@@ -9,6 +9,7 @@ sealed class TopLevelRoute(val path: String) {
     object SidebarLayoutGraph : TopLevelRoute("sidebar_layout")
     object SidebarInsetGraph : TopLevelRoute("sidebar_inset")
     object SidebarOffcanvasGraph : TopLevelRoute("sidebar_offcanvas")
+    object SidebarFloatingGraph : TopLevelRoute("sidebar_floating")
     object WebviewGraph : TopLevelRoute("webview/{slug}") {
         fun pathWithSlug(slug: WebViewSlug) = "webview/${slug.name}"
     }
