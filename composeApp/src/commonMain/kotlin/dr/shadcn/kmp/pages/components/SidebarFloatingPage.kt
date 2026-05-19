@@ -30,8 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.shadcn.ui.components.Button
-import com.shadcn.ui.components.ButtonSize
 import com.shadcn.ui.components.sidebar.Sidebar
 import com.shadcn.ui.components.sidebar.SidebarCollapsible
 import com.shadcn.ui.components.sidebar.SidebarContent
@@ -42,9 +40,12 @@ import com.shadcn.ui.components.sidebar.SidebarGroupLabel
 import com.shadcn.ui.components.sidebar.SidebarHeader
 import com.shadcn.ui.components.sidebar.SidebarInset
 import com.shadcn.ui.components.sidebar.SidebarMenu
+import com.shadcn.ui.components.sidebar.SidebarMenuBadge
 import com.shadcn.ui.components.sidebar.SidebarMenuButton
 import com.shadcn.ui.components.sidebar.SidebarMenuItem
+import com.shadcn.ui.components.sidebar.SidebarMenuSkeleton
 import com.shadcn.ui.components.sidebar.SidebarProvider
+import com.shadcn.ui.components.sidebar.SidebarSeparator
 import com.shadcn.ui.components.sidebar.SidebarTrigger
 import com.shadcn.ui.components.sidebar.SidebarVariant
 import com.shadcn.ui.themes.radius
@@ -53,14 +54,8 @@ import dr.shadcn.kmp.Content
 import dr.shadcn.kmp.SidebarRoute
 import dr.shadcn.kmp.navigation.SidebarNavigation
 
-/**
- * Demo: a sidebar that hides entirely when collapsed. Uses
- * `collapsible = SidebarCollapsible.Offcanvas` — when the user taps [SidebarTrigger], the
- * sidebar slot emits nothing and the inset reclaims the full width. Tap again to bring it
- * back. No icon rail is rendered.
- */
 @Composable
-fun SidebarOffcanvasPage() {
+fun SidebarFloatingPage() {
     val menus = listOf(
         Content("Dashboard", SidebarRoute.Dashboard.path),
         Content("Projects", SidebarRoute.Project.path),
@@ -71,8 +66,8 @@ fun SidebarOffcanvasPage() {
 
     SidebarProvider(
         defaultOpen = true,
-        variant = SidebarVariant.Sidebar,
-        collapsible = SidebarCollapsible.Offcanvas,
+        variant = SidebarVariant.Floating,
+        collapsible = SidebarCollapsible.Icon,
     ) {
         Sidebar {
             SidebarHeader(
@@ -107,6 +102,7 @@ fun SidebarOffcanvasPage() {
                                             sidebarNav.navigate(item.route)
                                         },
                                         isActive = selectedItem == item.title,
+                                        tooltip = item.title,
                                         icon = {
                                             Icon(
                                                 imageVector = when (item.title) {
@@ -127,20 +123,41 @@ fun SidebarOffcanvasPage() {
                                             fontWeight = FontWeight.Medium,
                                             modifier = Modifier.weight(1f),
                                         )
+                                        if (item.title == "Projects") {
+                                            SidebarMenuBadge {
+                                                Text(
+                                                    text = "5",
+                                                    fontSize = 12.sp,
+                                                    color = MaterialTheme.styles.sidebarForeground.copy(
+                                                        alpha = 0.7f
+                                                    ),
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+
+                SidebarSeparator()
+
+                SidebarGroup {
+                    SidebarGroupLabel("Loading…")
+                    SidebarGroupContent {
+                        SidebarMenu {
+                            repeat(3) { SidebarMenuSkeleton(showIcon = true) }
+                        }
+                    }
+                }
             }
-            SidebarFooter(text = "© 2025 Shadcn Compose")
+            SidebarFooter(text = "v1.0.0")
         }
         SidebarInset {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.styles.background)
                     .padding(horizontal = 8.dp),
             ) {
                 Row(
