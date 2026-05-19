@@ -38,7 +38,7 @@ kotlin {
             implementation(libs.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(project(":shadcn-ui-kmp"))
+            implementation(project(":komoui"))
 
             implementation(libs.coil.compose)
             implementation(libs.coil.svg)
