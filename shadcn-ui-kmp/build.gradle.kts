@@ -17,7 +17,7 @@ kotlin {
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "com.shadcn.ui.kmp"
+        namespace = "com.komoui"
         compileSdk = 36
         minSdk = 24
 

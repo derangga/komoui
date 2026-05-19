@@ -61,11 +61,11 @@ kotlin {
 }
 
 android {
-    namespace = "dr.shadcn.kmp"
+    namespace = "com.komoui.demo"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "dr.shadcn.kmp"
+        applicationId = "com.komoui.demo"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
