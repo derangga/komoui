@@ -18,7 +18,7 @@ if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
 fi
 
 # Update version in build.gradle.kts
-BUILD_FILE="shadcn-ui-kmp/build.gradle.kts"
+BUILD_FILE="komoui/build.gradle.kts"
 sed -i '' "s/version = \"[^\"]*\"/version = \"$VERSION\"/" "$BUILD_FILE"
 echo "Updated $BUILD_FILE to version $VERSION"
 
