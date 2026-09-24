@@ -2,10 +2,16 @@ package com.komoui.themes
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -27,12 +33,21 @@ fun Modifier.drawShadow(radius: Dp, shadow: BoxShadow): Modifier {
 }
 
 fun Modifier.drawShadows(radius: Dp, shadows: List<BoxShadow>): Modifier {
-    return this.drawBehind {
-        shadows.forEach { shadow ->
-            drawShadowLayer(
-                radius = radius * 2,
-                shadow = shadow
-            )
+    return this.drawWithCache {
+        // Like CSS box-shadow, skip the area under the box: the box paints over it anyway,
+        // and each blur layer drawn there is pure overdraw.
+        val box = Path().apply {
+            addRoundRect(RoundRect(size.toRect(), CornerRadius(radius.toPx())))
+        }
+        onDrawBehind {
+            clipPath(box, ClipOp.Difference) {
+                shadows.forEach { shadow ->
+                    drawShadowLayer(
+                        radius = radius * 2,
+                        shadow = shadow
+                    )
+                }
+            }
         }
     }
 }

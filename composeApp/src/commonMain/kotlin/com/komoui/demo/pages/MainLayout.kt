@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,8 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -149,80 +149,79 @@ fun MainLayout(rootNav: NavHostController, viewModel: MainViewModel, isDark: Boo
         SidebarInset {
             Scaffold(
                 topBar = {
-                    TopAppBar(
-                        colors = TopAppBarDefaults.topAppBarColors()
-                            .copy(containerColor = styles.background),
-                        title = {
-                            Button(
-                                variant = ButtonVariant.Outline,
-                                color = buttonColor(),
-                                onClick = {
-                                    showDialog = true
-                                },
-                            ) {
-                                Text(
-                                    "Search..",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Start
-                                )
-                            }
-                        },
-                        navigationIcon = {
-                            SidebarTrigger()
-                        },
-                        actions = {
-                            Button(
-                                variant = ButtonVariant.Ghost,
-                                size = ButtonSize.Icon,
-                                onClick = {
-                                    childNav.navigate(MainRoute.Themes.path)
+                    Column {
+                        TopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors()
+                                .copy(containerColor = Color.Transparent),
+                            title = {
+                                Button(
+                                    variant = ButtonVariant.Outline,
+                                    color = buttonColor(),
+                                    onClick = {
+                                        showDialog = true
+                                    },
+                                ) {
+                                    Text(
+                                        "Search..",
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Start
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Default.Palette,
-                                    tint = styles.primary,
-                                    contentDescription = "themes-selection"
-                                )
-                            }
-                            Button(
-                                variant = ButtonVariant.Ghost,
-                                size = ButtonSize.Icon,
-                                onClick = {
-//                                    rootNav.navigate(
-//                                        TopLevelRoute.WebviewGraph.pathWithSlug(
-//                                            WebViewSlug.Github
-//                                        )
-//                                    )
+                            },
+                            navigationIcon = {
+                                SidebarTrigger()
+                            },
+                            actions = {
+                                Button(
+                                    variant = ButtonVariant.Ghost,
+                                    size = ButtonSize.Icon,
+                                    onClick = {
+                                        childNav.navigate(MainRoute.Themes.path)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Palette,
+                                        tint = styles.primary,
+                                        contentDescription = "themes-selection"
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    AppIcons.Github,
-                                    tint = styles.primary,
-                                    contentDescription = "github"
-                                )
-                            }
-                            Button(
-                                variant = ButtonVariant.Ghost,
-                                size = ButtonSize.Icon,
-                                onClick = {
-                                    viewModel.switchTheme(isDark)
+                                Button(
+                                    variant = ButtonVariant.Ghost,
+                                    size = ButtonSize.Icon,
+                                    onClick = {
+    //                                    rootNav.navigate(
+    //                                        TopLevelRoute.WebviewGraph.pathWithSlug(
+    //                                            WebViewSlug.Github
+    //                                        )
+    //                                    )
+                                    }
+                                ) {
+                                    Icon(
+                                        AppIcons.Github,
+                                        tint = styles.primary,
+                                        contentDescription = "github"
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Default.DarkMode,
-                                    tint = styles.primary,
-                                    contentDescription = "themes",
-                                )
-                            }
-                        },
-                        modifier = Modifier.shadow(
-                            elevation = 2.dp,
-                            shape = RectangleShape,
-                            clip = false
-                        ),
-                    )
+                                Button(
+                                    variant = ButtonVariant.Ghost,
+                                    size = ButtonSize.Icon,
+                                    onClick = {
+                                        viewModel.switchTheme(isDark)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.DarkMode,
+                                        tint = styles.primary,
+                                        contentDescription = "themes",
+                                    )
+                                }
+                            },
+                        )
+                        HorizontalDivider(color = styles.border)
+                    }
                 },
-                containerColor = styles.background,
+                // SidebarInset already paints styles.background; painting it again here is overdraw.
+                containerColor = Color.Transparent,
             ) { ip ->
                 ComponentNavigation(
                     parentNav = rootNav,

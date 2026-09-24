@@ -4,7 +4,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.graphics.Color
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +63,10 @@ fun App(
         }
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            // Only hosts Sonner; SidebarInset paints the page background.
+            // contentColor is pinned so Transparent doesn't drop text to LocalContentColor's black.
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onBackground,
             snackbarHost = {
                 SonnerHost(hostState = snackbarHostState)
             },
